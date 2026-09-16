@@ -294,6 +294,81 @@ export class MockTransponderSocket {
 }
 
 /* ------------------------------------------------------------------ */
+/*  HTTP poller (real /api/assets feed)                                 */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Mimics the WebSocket subset AssetDataStreamer uses, but pulls JSON
+ * snapshots from a REST endpoint. Each asset in the payload becomes one
+ * telemetry frame so the rest of the pipeline stays unchanged.
+ */
+export class HttpTelemetryPoller {
+  static CONNECTING = 0;
+  static OPEN = 1;
+  static CLOSING = 2;
+  static CLOSED = 3;
+
+  constructor({ url, intervalMs }) {
+    this.readyState = HttpTelemetryPoller.CONNECTING;
+    this.onopen = null;
+    this.onmessage = null;
+    this.onclose = null;
+    this.onerror = null;
+    this.#url = url;
+    this.#intervalMs = intervalMs;
+    this.#timer = setTimeout(() => this.#open(), 40);
+  }
+
+  #url;
+  #intervalMs;
+  #timer;
+  #closed = false;
+  #inflight = false;
+  #failures = 0;
+
+  async #open() {
+    if (this.#closed) return;
+    this.readyState = HttpTelemetryPoller.OPEN;
+    this.onopen?.({ type: "open" });
+    await this.#tick();
+    if (!this.#closed) this.#timer = setInterval(() => this.#tick(), this.#intervalMs);
+  }
+
+  async #tick() {
+    if (this.readyState !== HttpTelemetryPoller.OPEN || this.#inflight) return;
+    this.#inflight = true;
+    try {
+      const res = await fetch(this.#url, { cache: "no-store" });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      const sentAt = typeof json.sentAt === "number" ? json.sentAt : Date.now();
+      const assets = Array.isArray(json.assets) ? json.assets : [];
+      for (const frame of assets) {
+        this.onmessage?.({
+          data: JSON.stringify({ channel: "telemetry", sentAt, payload: frame }),
+        });
+      }
+      this.#failures = 0;
+    } catch (err) {
+      this.#failures += 1;
+      if (this.#failures >= 3) this.onerror?.(err);
+    } finally {
+      this.#inflight = false;
+    }
+  }
+
+  close(code = 1000, reason = "client closed") {
+    if (this.readyState === HttpTelemetryPoller.CLOSED) return;
+    this.#closed = true;
+    this.readyState = HttpTelemetryPoller.CLOSING;
+    clearTimeout(this.#timer);
+    clearInterval(this.#timer);
+    this.readyState = HttpTelemetryPoller.CLOSED;
+    this.onclose?.({ code, reason, wasClean: true });
+  }
+}
+
+/* ------------------------------------------------------------------ */
 /*  Streamer                                                            */
 /* ------------------------------------------------------------------ */
 
@@ -305,9 +380,9 @@ export class AssetDataStreamer {
    * @param {number} opts.radiusKm
    * @param {number} opts.intervalMs
    * @param {number} opts.targetCount
-   * @param {string} [opts.endpoint]  set to a real wss:// URL to replace the mock
+   * @param {string} [opts.endpoint]  http(s) poll URL or wss:// socket
    */
-  constructor({ bus, origin, radiusKm = 50, intervalMs = 1000, targetCount = 6, endpoint = null }) {
+  constructor({ bus, origin, radiusKm = 50, intervalMs = 2000, targetCount = 6, endpoint = "/api/assets" }) {
     this.bus = bus;
     this.origin = origin;
     this.radiusKm = radiusKm;
@@ -336,8 +411,11 @@ export class AssetDataStreamer {
     this.#manuallyClosed = false;
     this.bus.emit("stream:status", { connected: false, text: "Connecting to feed…" });
 
-    if (this.endpoint) {
-      this.socket = new WebSocket(this.endpoint);
+    const endpoint = this.endpoint;
+    if (endpoint && (endpoint.startsWith("ws://") || endpoint.startsWith("wss://"))) {
+      this.socket = new WebSocket(endpoint);
+    } else if (endpoint) {
+      this.socket = new HttpTelemetryPoller({ url: endpoint, intervalMs: this.intervalMs });
     } else {
       const fleet = buildFleet(this.origin, this.radiusKm, this.targetCount);
       this.socket = new MockTransponderSocket({

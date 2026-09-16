@@ -45,7 +45,7 @@ export class EventBus {
 /*  Settings manager                                                   */
 /* ------------------------------------------------------------------ */
 
-const STORAGE_NS = "meridian.v1";
+const STORAGE_NS = "geoxis.v1";
 
 const KEY_RULES = {
   googleMapsKey: {
@@ -243,7 +243,7 @@ export class B2BSaasEngine {
     origin: { latitude: 51.9486, longitude: 4.1444 },
     initialCameraAltitudeMeters: 18_000,
     initialCameraPitchDegrees: -45,
-    streamIntervalMs: 1000,
+    streamIntervalMs: 2000,
     streamTargetCount: 6,
     streamRadiusKm: 50,
     assetStaleAfterMs: 15_000,
@@ -311,6 +311,7 @@ export class B2BSaasEngine {
       radiusKm: this.config.streamRadiusKm,
       intervalMs: this.config.streamIntervalMs,
       targetCount: this.config.streamTargetCount,
+      endpoint: "/api/assets",
     });
     this.#wireStream();
     this.stream.connect();
@@ -327,8 +328,8 @@ export class B2BSaasEngine {
     this.#wireLayers();
     this.#startStaleSweep();
 
-    if (!this.settings.hasKey("googleMapsKey") && !this.settings.hasKey("openaiKey")) {
-      this.ui.toast("Add your API keys in settings to enable 3D tiles and the assistant.");
+    if (!this.settings.hasKey("googleMapsKey")) {
+      this.ui.toast("Globe is live on the default tiles. Optional: add a Google Maps key for photorealistic 3D.");
     }
 
     window.addEventListener("beforeunload", () => this.shutdown());
@@ -399,7 +400,7 @@ export class B2BSaasEngine {
 /* ------------------------------------------------------------------ */
 
 const engine = new B2BSaasEngine();
-window.meridian = engine; // handy for debugging from the console
+window.geoxis = engine;
 
 engine.start().catch((err) => {
   console.error("[engine] fatal boot error", err);

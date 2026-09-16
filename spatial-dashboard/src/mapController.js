@@ -15,10 +15,11 @@ import "cesium/Build/Cesium/Widgets/widgets.css";
 
 /** Marker palette per asset type. Kept in one place so UI and map agree. */
 export const ASSET_STYLES = Object.freeze({
-  vessel:  { color: "#34d399", label: "Vessel" },
-  truck:   { color: "#38bdf8", label: "Truck" },
-  drone:   { color: "#a78bfa", label: "Drone" },
-  default: { color: "#94a3b8", label: "Asset" },
+  vessel:   { color: "#34d399", label: "Vessel" },
+  truck:    { color: "#38bdf8", label: "Truck" },
+  drone:    { color: "#a78bfa", label: "Drone" },
+  aircraft: { color: "#fbbf24", label: "Aircraft" },
+  default:  { color: "#94a3b8", label: "Asset" },
 });
 
 const TRAIL_MAX_POINTS = 60;

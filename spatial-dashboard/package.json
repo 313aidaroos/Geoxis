@@ -1,5 +1,5 @@
 {
-  "name": "spatial-intel-dashboard",
+  "name": "geoxis",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -14,5 +14,8 @@
   "devDependencies": {
     "vite": "^5.4.0",
     "vite-plugin-cesium": "^1.2.23"
+  },
+  "allowScripts": {
+    "esbuild": true
   }
 }
