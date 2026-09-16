@@ -293,18 +293,7 @@ export class B2BSaasEngine {
     this.ui = new UIController(this);
     this.ui.mount();
 
-    // 2. Globe.
-    this.map = new GeospatialMap({
-      containerId: "cesiumContainer",
-      bus: this.bus,
-      state: this.state,
-      origin: this.config.origin,
-      altitude: this.config.initialCameraAltitudeMeters,
-      pitch: this.config.initialCameraPitchDegrees,
-    });
-    await this.map.initialize({ googleMapsKey: this.settings.getKey("googleMapsKey") });
-
-    // 3. Telemetry pipeline.
+    // 2. Telemetry before the globe — the asset list must not wait on Cesium.
     this.stream = new AssetDataStreamer({
       bus: this.bus,
       origin: this.config.origin,
@@ -316,6 +305,26 @@ export class B2BSaasEngine {
     this.#wireStream();
     this.stream.connect();
 
+    // 3. Globe (markers no-op until the viewer exists, then replay).
+    this.map = new GeospatialMap({
+      containerId: "cesiumContainer",
+      bus: this.bus,
+      state: this.state,
+      origin: this.config.origin,
+      altitude: this.config.initialCameraAltitudeMeters,
+      pitch: this.config.initialCameraPitchDegrees,
+    });
+    try {
+      await this.map.initialize({ googleMapsKey: this.settings.getKey("googleMapsKey") });
+      this.#wireLayers();
+      this.#replayMarkers();
+    } catch (err) {
+      console.error("[engine] globe failed; live list still running", err);
+      this.ui.toast("Globe failed to start. Live assets are still in the list.", "error");
+      const status = document.getElementById("mapStatus");
+      if (status) status.textContent = "Globe failed — asset list is live.";
+    }
+
     // 4. AI agent (lazy-connects when the panel is opened and a key exists).
     this.ai = new SpatialAIAgent({
       bus: this.bus,
@@ -325,7 +334,6 @@ export class B2BSaasEngine {
       model: this.settings.getAll().aiModel,
     });
 
-    this.#wireLayers();
     this.#startStaleSweep();
 
     if (!this.settings.hasKey("googleMapsKey")) {
@@ -340,16 +348,23 @@ export class B2BSaasEngine {
     this.bus.on("stream:frame", (frame) => {
       const asset = this.state.upsertAsset(frame);
       if (this.state.layers.fleet) {
-        this.map.upsertAssetMarker(
+        this.map?.upsertAssetMarker(
           asset.id, asset.type, asset.latitude, asset.longitude, asset.heading, asset,
         );
       }
       if (this.state.followingAssetId === asset.id) {
-        this.map.trackAsset(asset.id);
+        this.map?.trackAsset(asset.id);
       }
     });
     this.bus.on("stream:latency", (ms) => this.state.setLatency(ms));
     this.bus.on("stream:status", (status) => this.state.setFeedStatus(status));
+  }
+
+  #replayMarkers() {
+    if (!this.map) return;
+    for (const a of this.state.assets.values()) {
+      this.map.upsertAssetMarker(a.id, a.type, a.latitude, a.longitude, a.heading, a);
+    }
   }
 
   #wireLayers() {
@@ -373,7 +388,7 @@ export class B2BSaasEngine {
       const cutoff = Date.now() - this.config.assetStaleAfterMs;
       for (const a of this.state.assets.values()) {
         if (a.lastSeen < cutoff) {
-          this.map.removeAssetMarker(a.id);
+          this.map?.removeAssetMarker(a.id);
           this.state.removeAsset(a.id);
         }
       }

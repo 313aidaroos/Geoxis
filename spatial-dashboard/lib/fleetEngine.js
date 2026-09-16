@@ -196,13 +196,16 @@ const AIR_TTL_MS = 10_000;
 async function fetchOpenSky(nowMs) {
   if (nowMs - airCache.at < AIR_TTL_MS) return airCache;
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 4000);
+  const timer = setTimeout(() => controller.abort(), 1500);
   try {
     const url =
       "https://opensky-network.org/api/states/all?lamin=51.4&lomin=3.5&lamax=52.4&lomax=5.0";
     const res = await fetch(url, {
       signal: controller.signal,
-      headers: { Accept: "application/json" },
+      headers: {
+        Accept: "application/json",
+        "User-Agent": "Geoxis/0.1 (operations globe)",
+      },
     });
     if (!res.ok) throw new Error(`opensky ${res.status}`);
     const json = await res.json();
