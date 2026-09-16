@@ -285,15 +285,10 @@ export class B2BSaasEngine {
   }
 
   async start() {
-    if (!this.env.hasWebGL) {
-      throw new Error("This browser does not support WebGL, which the 3D globe requires.");
-    }
-
-    // 1. UI first so status is visible while heavier modules boot.
+    // 1. UI + live feed first. Do not wait on WebGL/Cesium for the counters.
     this.ui = new UIController(this);
     this.ui.mount();
 
-    // 2. Telemetry before the globe — the asset list must not wait on Cesium.
     this.stream = new AssetDataStreamer({
       bus: this.bus,
       origin: this.config.origin,
@@ -306,7 +301,11 @@ export class B2BSaasEngine {
     this.stream.connect();
 
     // 3. Globe (markers no-op until the viewer exists, then replay).
-    this.map = new GeospatialMap({
+    if (!this.env.hasWebGL) {
+      const status = document.getElementById("mapStatus");
+      if (status) status.textContent = "No WebGL — asset list is live from /api/assets.";
+    } else {
+      this.map = new GeospatialMap({
       containerId: "cesiumContainer",
       bus: this.bus,
       state: this.state,
@@ -323,6 +322,7 @@ export class B2BSaasEngine {
       this.ui.toast("Globe failed to start. Live assets are still in the list.", "error");
       const status = document.getElementById("mapStatus");
       if (status) status.textContent = "Globe failed — asset list is live.";
+    }
     }
 
     // 4. AI agent (lazy-connects when the panel is opened and a key exists).

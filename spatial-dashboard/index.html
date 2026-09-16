@@ -85,7 +85,7 @@
       <div class="flex-1 min-h-0 flex flex-col">
         <div class="px-4 pt-3 pb-2 flex items-center justify-between">
           <div class="text-[12px] text-slate-500">Live assets</div>
-          <div class="text-[12px] text-slate-500"><span id="assetCount">0</span> tracked</div>
+          <div class="text-[12px] text-slate-500"><span id="assetCount">—</span> tracked</div>
         </div>
         <ul id="assetList" class="flex-1 overflow-y-auto px-2 pb-3 space-y-1" role="list" aria-live="polite"></ul>
         <div id="assetListEmpty" class="px-4 pb-4 text-[13px] text-slate-500">
@@ -109,7 +109,7 @@
       <div id="metricsBar" class="absolute top-4 left-1/2 -translate-x-1/2 flex items-stretch rounded-lg bg-surface-1/90 backdrop-blur border border-line shadow-lg shadow-black/40 divide-x divide-line">
         <div class="metric">
           <div class="metric-label">Monitored assets</div>
-          <div class="metric-value" id="mTotalAssets">0</div>
+          <div class="metric-value" id="mTotalAssets">—</div>
         </div>
         <div class="metric">
           <div class="metric-label">System latency</div>
@@ -220,6 +220,33 @@
   <!-- Toasts -->
   <div id="toasts" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 space-y-2 pointer-events-none"></div>
 
+  <script>
+    (function seedAssetCounter() {
+      function paint(n, alarms) {
+        var total = document.getElementById("mTotalAssets");
+        var count = document.getElementById("assetCount");
+        if (total) total.textContent = String(n);
+        if (count) count.textContent = String(n);
+        var empty = document.getElementById("assetListEmpty");
+        if (empty && n) empty.classList.add("hidden");
+        var feed = document.getElementById("feedStatus");
+        if (feed) feed.textContent = "Feed connected";
+        var dot = document.getElementById("feedDot");
+        if (dot) dot.className = "w-2 h-2 rounded-full bg-emerald-400";
+        var alarmEl = document.getElementById("mAlarms");
+        if (alarmEl && typeof alarms === "number") alarmEl.textContent = String(alarms);
+      }
+      fetch("/api/assets", { cache: "no-store" })
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          var assets = Array.isArray(data.assets) ? data.assets : [];
+          var alarms = 0;
+          for (var i = 0; i < assets.length; i++) if (assets[i] && assets[i].alarm) alarms += 1;
+          paint(assets.length, alarms);
+        })
+        .catch(function () {});
+    })();
+  </script>
   <script type="module" src="/src/main.js"></script>
 </body>
 </html>

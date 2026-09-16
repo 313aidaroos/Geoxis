@@ -25,8 +25,25 @@ function geoxisApi() {
   };
 }
 
+function cesiumInBody() {
+  return {
+    name: "geoxis-cesium-body",
+    transformIndexHtml(html) {
+      const withoutHeadCesium = html.replace(
+        /<script src="[^"]*Cesium\.js"><\/script>\s*/g,
+        "",
+      );
+      if (withoutHeadCesium.includes("Cesium.js")) return withoutHeadCesium;
+      return withoutHeadCesium.replace(
+        '<script type="module"',
+        '<script src="/cesium/Cesium.js" defer></script>\n  <script type="module"',
+      );
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [cesium(), geoxisApi()],
+  plugins: [cesium(), geoxisApi(), cesiumInBody()],
   server: { port: 5173, open: false },
   preview: { port: 4173 },
   build: { target: "es2022", sourcemap: true },
