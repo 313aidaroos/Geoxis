@@ -44,7 +44,12 @@
           <div class="text-[15px] font-semibold text-slate-100">Geoxis</div>
           <div class="text-[11px] text-slate-500">Live operations · Rotterdam</div>
         </div>
-        <button id="btnSettings" class="ml-auto p-1.5 rounded-md text-slate-400 hover:text-slate-100 hover:bg-surface-3 focus-ring" title="API keys & settings" aria-label="Settings">
+        <nav class="ml-auto flex items-center gap-2 text-[12px]">
+          <a href="/login.html" class="text-slate-400 hover:text-emerald-300">Login</a>
+          <a href="/support.html" class="text-slate-400 hover:text-emerald-300">Support</a>
+          <a href="/admin.html" class="text-slate-400 hover:text-emerald-300">Admin</a>
+        </nav>
+        <button id="btnSettings" class="p-1.5 rounded-md text-slate-400 hover:text-slate-100 hover:bg-surface-3 focus-ring" title="Map settings" aria-label="Settings">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
         </button>
       </div>
@@ -153,8 +158,8 @@
       <!-- ============ CONVERSATIONAL AI PANEL ============ -->
       <section id="aiPanel" class="ai-panel absolute bottom-4 right-4 w-[380px] h-[520px] max-h-[calc(100%-2rem)] flex flex-col rounded-lg bg-surface-1 border border-line shadow-2xl shadow-black/50 translate-y-[calc(100%+1.5rem)] opacity-0 pointer-events-none" aria-label="Spatial assistant">
         <header class="h-12 px-4 flex items-center gap-3 border-b border-line">
-          <div class="text-[14px] font-medium text-slate-100">Spatial assistant</div>
-          <!-- Network pulse: reflects streaming tokens -->
+          <div class="text-[14px] font-medium text-slate-100">Cixy</div>
+          <!-- Network pulse: reflects Cixy state -->
           <div id="aiPulse" class="pulse" data-state="idle" title="Connection state" aria-label="Assistant connection state">
             <span></span><span></span><span></span>
           </div>
@@ -166,16 +171,16 @@
 
         <div id="chatLog" class="flex-1 min-h-0 overflow-y-auto px-4 py-3 space-y-3 text-[13px]" role="log" aria-live="polite">
           <div class="msg msg-assistant">
-            Ask about what's in your viewport, request a flight to an asset, or check ETAs. I have live access to the map's camera position and the selected asset.
+            Ask Cixy about live assets, geofences, ETAs, and operational risk. Cixy uses the live Geoxis feed and never invents missing data.
           </div>
         </div>
 
         <footer class="p-3 border-t border-line">
           <div class="flex items-end gap-2">
-            <button id="btnMic" class="h-9 w-9 shrink-0 rounded-md bg-surface-2 border border-line text-slate-300 hover:text-slate-100 hover:border-line-strong focus-ring" aria-pressed="false" title="Hold to talk">
+            <button id="btnMic" class="hidden h-9 w-9 shrink-0 rounded-md bg-surface-2 border border-line text-slate-300 hover:text-slate-100 hover:border-line-strong focus-ring" aria-pressed="false" title="Voice coming soon">
               <svg class="mx-auto" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
             </button>
-            <textarea id="chatInput" rows="1" placeholder="Ask about assets in view…"
+            <textarea id="chatInput" rows="1" placeholder="Ask Cixy about live assets…"
                       class="flex-1 resize-none h-9 max-h-28 px-3 py-2 rounded-md bg-surface-2 border border-line text-[13px] text-slate-100 placeholder-slate-500 focus-ring"></textarea>
             <button id="btnSend" class="h-9 px-3 shrink-0 rounded-md bg-emerald-500 text-slate-950 text-[13px] font-medium hover:bg-emerald-400 disabled:opacity-40 disabled:hover:bg-emerald-500 focus-ring">Send</button>
           </div>

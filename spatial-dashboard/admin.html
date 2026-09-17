@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Geoxis Admin</title>
+  <link rel="stylesheet" href="/src/styles.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-surface-0 text-slate-100 font-sans p-6">
+  <main class="mx-auto max-w-5xl">
+    <a href="/" class="text-emerald-300 text-sm">← Geoxis globe</a>
+    <div class="mt-5 flex items-end justify-between gap-4">
+      <div>
+        <h1 class="text-2xl font-semibold">Support queue</h1>
+        <p class="mt-1 text-sm text-slate-400">Owner/admin only. awad@apixis.dev is the owner account.</p>
+      </div>
+      <a href="/login.html" class="rounded-md border border-line px-3 py-2 text-sm">Login</a>
+    </div>
+    <p id="status" class="mt-5 text-sm text-slate-400">Checking session…</p>
+    <div id="tickets" class="mt-5 grid gap-3"></div>
+  </main>
+  <script type="module">
+    import { authHeader, loadMe } from "/src/authClient.js";
+    const status = document.getElementById("status");
+    const tickets = document.getElementById("tickets");
+    const me = await loadMe().catch(() => null);
+    if (!me) {
+      status.innerHTML = 'Not signed in. <a class="text-emerald-300" href="/login.html">Send a magic link</a>.';
+    } else if (!me.admin) {
+      status.textContent = `Signed in as ${me.user.email}; owner/admin access required.`;
+    } else {
+      const res = await fetch("/api/admin/support", { headers: authHeader(), cache: "no-store" });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) status.textContent = data.error || "Could not load tickets.";
+      else {
+        status.textContent = `${data.tickets.length} ticket(s)`;
+        tickets.innerHTML = data.tickets.map((t) => `<article class="rounded-lg border border-line bg-surface-1 p-4"><div class="flex justify-between gap-4"><h2 class="font-medium">${escapeHtml(t.subject)}</h2><span class="text-xs text-slate-500">${escapeHtml(t.status)}</span></div><p class="mt-1 text-xs text-slate-500">${escapeHtml(t.requester_email)} → ${escapeHtml(t.route_to)} · ${new Date(t.created_at).toLocaleString()}</p><p class="mt-3 whitespace-pre-wrap text-sm text-slate-300">${escapeHtml(t.message)}</p></article>`).join("") || '<p class="text-slate-500">No tickets yet.</p>';
+      }
+    }
+    function escapeHtml(s) { return String(s ?? "").replace(/[&<>"]/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c])); }
+  </script>
+</body>
+</html>

@@ -1,4 +1,5 @@
 import { defineConfig } from "vite";
+import { resolve } from "path";
 import cesium from "vite-plugin-cesium";
 import { snapshot } from "./lib/fleetEngine.js";
 
@@ -46,5 +47,16 @@ export default defineConfig({
   plugins: [cesium(), geoxisApi(), cesiumInBody()],
   server: { port: 5173, open: false },
   preview: { port: 4173 },
-  build: { target: "es2022", sourcemap: true },
+  build: {
+    target: "es2022",
+    sourcemap: true,
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, "index.html"),
+        login: resolve(__dirname, "login.html"),
+        support: resolve(__dirname, "support.html"),
+        admin: resolve(__dirname, "admin.html"),
+      },
+    },
+  },
 });

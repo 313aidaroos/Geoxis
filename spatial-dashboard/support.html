@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Geoxis Support</title>
+  <link rel="stylesheet" href="/src/styles.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-surface-0 text-slate-100 font-sans flex items-center justify-center p-6">
+  <main class="w-full max-w-xl rounded-2xl border border-line bg-surface-1 p-6 shadow-2xl">
+    <a href="/" class="text-emerald-300 text-sm">← Geoxis globe</a>
+    <h1 class="mt-4 text-2xl font-semibold">Geoxis support</h1>
+    <p class="mt-2 text-sm text-slate-400">Messages enter the geoxis@apixis.dev queue and route to awad@apixis.dev.</p>
+    <form id="supportForm" class="mt-6 space-y-3">
+      <input id="email" type="email" required placeholder="you@company.com" class="w-full h-11 px-3 rounded-md bg-surface-2 border border-line" />
+      <input id="subject" required minlength="3" maxlength="140" placeholder="Subject" class="w-full h-11 px-3 rounded-md bg-surface-2 border border-line" />
+      <textarea id="message" required minlength="10" maxlength="5000" rows="7" placeholder="What do you need help with?" class="w-full p-3 rounded-md bg-surface-2 border border-line"></textarea>
+      <button class="w-full h-11 rounded-md bg-emerald-500 text-slate-950 font-medium">Send to support</button>
+    </form>
+    <p id="status" class="mt-4 text-sm text-slate-400"></p>
+  </main>
+  <script type="module">
+    import { authHeader, loadMe } from "/src/authClient.js";
+    const status = document.getElementById("status");
+    loadMe().then((me) => { if (me?.user?.email) document.getElementById("email").value = me.user.email; }).catch(() => {});
+    document.getElementById("supportForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      status.textContent = "Sending…";
+      const payload = {
+        email: document.getElementById("email").value,
+        subject: document.getElementById("subject").value,
+        message: document.getElementById("message").value,
+      };
+      const res = await fetch("/api/support", { method: "POST", headers: { "Content-Type": "application/json", ...authHeader() }, body: JSON.stringify(payload) });
+      const data = await res.json().catch(() => ({}));
+      status.textContent = res.ok ? `Ticket ${data.ticket.id} created and routed to ${data.ticket.route_to}.` : (data.error || "Support failed.");
+    });
+  </script>
+</body>
+</html>

@@ -1,4 +1,5 @@
 import { snapshot } from "../lib/fleetEngine.js";
+import { authContext, listTenantAssets, sendJson } from "../lib/supabaseServer.js";
 
 export default async function handler(req, res) {
   if (req.method === "OPTIONS") {
@@ -9,23 +10,26 @@ export default async function handler(req, res) {
     return;
   }
   if (req.method && req.method !== "GET") {
-    res.statusCode = 405;
-    res.setHeader("Allow", "GET");
-    res.setHeader("Content-Type", "application/json");
-    res.end(JSON.stringify({ error: "method_not_allowed" }));
-    return;
+    return sendJson(res, 405, { error: "method_not_allowed" }, { Allow: "GET" });
   }
 
   try {
+    const auth = req.headers.authorization || req.headers.Authorization;
+    if (auth) {
+      const ctx = await authContext(req);
+      if (!ctx) return sendJson(res, 401, { error: "not_authenticated" });
+      const assets = await listTenantAssets(ctx.tenant.id);
+      return sendJson(res, 200, {
+        sentAt: Date.now(),
+        tenant: ctx.tenant,
+        sources: { tenant: "supabase" },
+        assets,
+      }, { "Cache-Control": "no-store", "Access-Control-Allow-Origin": "*" });
+    }
+
     const body = await snapshot();
-    res.statusCode = 200;
-    res.setHeader("Content-Type", "application/json; charset=utf-8");
-    res.setHeader("Cache-Control", "no-store");
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.end(JSON.stringify(body));
+    return sendJson(res, 200, body, { "Cache-Control": "no-store", "Access-Control-Allow-Origin": "*" });
   } catch (err) {
-    res.statusCode = 500;
-    res.setHeader("Content-Type", "application/json; charset=utf-8");
-    res.end(JSON.stringify({ error: "snapshot_failed", message: String(err?.message || err) }));
+    return sendJson(res, err.status || 500, { error: "assets_failed", message: String(err?.message || err) });
   }
 }

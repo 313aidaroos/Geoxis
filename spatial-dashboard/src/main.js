@@ -8,7 +8,7 @@
 
 import { GeospatialMap } from "./mapController.js";
 import { AssetDataStreamer } from "./streamSimulator.js";
-import { SpatialAIAgent } from "./aiController.js";
+import { SpatialAIAgent } from "./cixyController.js";
 import { UIController } from "./uiController.js";
 
 /* ------------------------------------------------------------------ */
