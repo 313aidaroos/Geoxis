@@ -98,3 +98,21 @@ test("cixy rejects when last message is not from user", () => {
 test("cixy system prompt says none in view when empty", () => {
   assert.match(cixySystemPrompt({}), /none in view/);
 });
+
+test("cixy embeds Muslim identity in system prompt", () => {
+  const prompt = cixySystemPrompt({ tenant: "test", assets: [] });
+  assert.match(prompt, /Muslim/);
+  assert.match(prompt, /As-salamu alaykum/);
+  assert.match(prompt, /insha.Allah/);
+  assert.match(prompt, /alhamdulillah/);
+  assert.match(prompt, /halal-conscious/);
+  assert.match(prompt, /Never fabricate/);
+});
+
+test("cixy merges Muslim identity with domain expertise", () => {
+  const prompt = cixySystemPrompt({ tenant: "acme", assets: [{ id: "T1", name: "Truck 1", latitude: 51.9, longitude: 4.1 }] });
+  assert.match(prompt, /Muslim/);
+  assert.match(prompt, /fleet telematics/);
+  assert.match(prompt, /Truck 1/);
+  assert.match(prompt, /Tenant: acme/);
+});
