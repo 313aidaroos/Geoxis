@@ -8,6 +8,7 @@ export function envConfig(env = process.env) {
     anonKey: env.SUPABASE_ANON_KEY || "",
     serviceKey: env.SUPABASE_SERVICE_ROLE_KEY || "",
     anthropicKey: env.ANTHROPIC_API_KEY || "",
+    resendKey: env.RESEND_API_KEY || "",
     appUrl: env.APP_URL || "",
   };
 }
@@ -157,4 +158,14 @@ export async function createSupportTicket(ticket) {
 
 export async function listSupportTickets() {
   return sbFetch("/rest/v1/support_tickets?select=*&order=created_at.desc&limit=100", { service: true });
+}
+
+export async function updateSupportTicket(id, updates) {
+  const rows = await sbFetch(`/rest/v1/support_tickets?id=eq.${encodeURIComponent(id)}`, {
+    method: "PATCH",
+    service: true,
+    body: updates,
+    headers: { Prefer: "return=representation" },
+  });
+  return Array.isArray(rows) ? rows[0] : rows;
 }

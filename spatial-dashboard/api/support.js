@@ -1,5 +1,5 @@
 import { validateTicket } from "../lib/core.js";
-import { authContext, createSupportTicket, sendJson } from "../lib/supabaseServer.js";
+import { authContext, createSupportTicket, sendJson, envConfig } from "../lib/supabaseServer.js";
 
 async function readBody(req) {
   if (req.body && typeof req.body === "object") return req.body;
@@ -26,6 +26,31 @@ export default async function handler(req, res) {
     const validated = validateTicket({ ...body, tenant_id: ctx?.tenant?.id ?? null });
     if (!validated.ok) return sendJson(res, 400, validated);
     const row = await createSupportTicket(validated.ticket);
+
+    // Send email via Resend
+    const cfg = envConfig();
+    if (cfg.resendKey) {
+      const subject = `[Geoxis Support] ${validated.ticket.subject}`;
+      const html = `<p><strong>From:</strong> ${validated.ticket.email}</p>
+<p><strong>Subject:</strong> ${validated.ticket.subject}</p>
+<p><strong>Message:</strong></p>
+<p>${validated.ticket.message.replace(/\n/g, "<br>")}</p>
+<p><small>Tenant: ${validated.ticket.tenant_id || "public"} | Ticket ID: ${row.id}</small></p>`;
+      await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${cfg.resendKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from: "Geoxis <geoxis@apixis.dev>",
+          to: validated.ticket.route_to,
+          subject,
+          html,
+        }),
+      });
+    }
+
     return sendJson(res, 201, {
       ok: true,
       ticket: {
