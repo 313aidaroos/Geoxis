@@ -86,15 +86,24 @@ export class GeospatialMap {
     });
 
     // Explicitly add Esri imagery layer after viewer creation (more reliable across builds)
-    const esriLayer = new Cesium.ImageryLayer(
-      new Cesium.UrlTemplateImageryProvider({
-        url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-        maximumLevel: 19,
-        credit: "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
-      })
-    );
-    this.viewer.imageryLayers.removeAll();
-    this.viewer.imageryLayers.add(esriLayer);
+    let esriLayer;
+    try {
+      esriLayer = new Cesium.ImageryLayer(
+        new Cesium.UrlTemplateImageryProvider({
+          url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+          maximumLevel: 19,
+          credit: "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+        })
+      );
+      this.viewer.imageryLayers.removeAll();
+      const addedLayer = this.viewer.imageryLayers.add(esriLayer);
+      console.log("[map] imageryLayers.add() returned:", addedLayer);
+      console.log("[map] layer.ready:", esriLayer.ready, "layer.show:", esriLayer.show);
+      this.#setStatus("Globe ready (Esri layer added)");
+    } catch (err) {
+      console.error("[map] Failed to add imagery layer:", err);
+      this.#setStatus("IMAGERY ERROR: " + (err?.message || err));
+    }
 
     const scene = this.viewer.scene;
     scene.globe.enableLighting = false;
