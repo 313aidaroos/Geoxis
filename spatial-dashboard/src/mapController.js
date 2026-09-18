@@ -67,7 +67,8 @@ export class GeospatialMap {
   /* ---------------------------------------------------------------- */
 
   async initialize({ googleMapsKey = "" } = {}) {
-    this.#setStatus("Initializing globe…");
+    this.#setStatus("step1: initialize() entered");
+    console.log("[map] step1: initialize() entered");
 
     this.viewer = new Cesium.Viewer(this.containerId, {
       animation: false,
@@ -84,6 +85,8 @@ export class GeospatialMap {
       requestRenderMode: false,
       terrain: undefined,
     });
+    this.#setStatus("step2: Viewer constructed");
+    console.log("[map] step2: Viewer constructed");
 
     // Explicitly add Esri imagery layer after viewer creation (more reliable across builds)
     let esriLayer;
@@ -104,6 +107,8 @@ export class GeospatialMap {
       console.error("[map] Failed to add imagery layer:", err);
       this.#setStatus("IMAGERY ERROR: " + (err?.message || err));
     }
+    this.#setStatus("step3: past imagery layer block");
+    console.log("[map] step3: past imagery layer block");
 
     const scene = this.viewer.scene;
     scene.globe.enableLighting = false;
