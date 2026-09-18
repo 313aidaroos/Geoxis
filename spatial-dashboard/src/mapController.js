@@ -127,6 +127,10 @@ export class GeospatialMap {
       const pos = this.viewer.camera.position;
       console.log("[map] camera.position (Cartesian3):", pos ? { x: pos.x, y: pos.y, z: pos.z } : null);
       console.log("[map] globe.show:", this.viewer.scene.globe.show);
+
+      // Precise numeric diagnostic
+      const c = this.viewer.camera.positionCartographic;
+      console.log('[map] cam lon/lat/height:', Cesium.Math.toDegrees(c.longitude), Cesium.Math.toDegrees(c.latitude), c.height, '| frustum near/far:', this.viewer.camera.frustum.near, this.viewer.camera.frustum.far, '| isNaN check:', isNaN(c.height));
     } catch (e) {
       console.log("[map] extra diagnostic failed:", e);
     }
