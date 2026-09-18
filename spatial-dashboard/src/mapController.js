@@ -82,12 +82,12 @@ export class GeospatialMap {
       selectionIndicator: false,
       shouldAnimate: true,
       requestRenderMode: false,
-      // OpenStreetMap raster tiles (free, no token, reliable in production)
+      // Esri World Imagery (free, reliable, no token, works in production)
       baseLayer: new Cesium.ImageryLayer(
         new Cesium.UrlTemplateImageryProvider({
-          url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+          url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
           maximumLevel: 19,
-          credit: "© OpenStreetMap contributors",
+          credit: "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
         })
       ),
       terrain: undefined,
