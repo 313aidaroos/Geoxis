@@ -110,6 +110,18 @@ export class GeospatialMap {
     this.#setStatus("step3: past imagery layer block");
     console.log("[map] step3: past imagery layer block");
 
+    // Diagnostic: check if Cesium thinks there is anything to render
+    try {
+      const cam = this.viewer.camera.positionCartographic;
+      console.log("[map] camera positionCartographic:", cam ? { lat: Cesium.Math.toDegrees(cam.latitude), lon: Cesium.Math.toDegrees(cam.longitude), height: cam.height } : null);
+      console.log("[map] globe.tilesLoaded:", this.viewer.scene.globe.tilesLoaded);
+      const surface = this.viewer.scene.globe._surface;
+      const tilesToRender = surface?._tilesToRender?.length ?? "n/a";
+      console.log("[map] _tilesToRender.length:", tilesToRender);
+    } catch (e) {
+      console.log("[map] diagnostic logging failed:", e);
+    }
+
     const scene = this.viewer.scene;
     scene.globe.enableLighting = false;
     scene.globe.baseColor = Cesium.Color.fromCssColorString("#0f1117");
