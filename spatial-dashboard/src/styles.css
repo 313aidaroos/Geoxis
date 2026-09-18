@@ -3,6 +3,10 @@
 
 :root { color-scheme: dark; }
 
+body, * {
+  font-family: 'Special Elite', monospace !important;
+}
+
 .tabular { font-variant-numeric: tabular-nums; }
 
 .focus-ring:focus-visible {
