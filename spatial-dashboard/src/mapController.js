@@ -82,16 +82,19 @@ export class GeospatialMap {
       selectionIndicator: false,
       shouldAnimate: true,
       requestRenderMode: false,
-      // Esri World Imagery (free, reliable, no token, works in production)
-      baseLayer: new Cesium.ImageryLayer(
-        new Cesium.UrlTemplateImageryProvider({
-          url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-          maximumLevel: 19,
-          credit: "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
-        })
-      ),
       terrain: undefined,
     });
+
+    // Explicitly add Esri imagery layer after viewer creation (more reliable across builds)
+    const esriLayer = new Cesium.ImageryLayer(
+      new Cesium.UrlTemplateImageryProvider({
+        url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        maximumLevel: 19,
+        credit: "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+      })
+    );
+    this.viewer.imageryLayers.removeAll();
+    this.viewer.imageryLayers.add(esriLayer);
 
     const scene = this.viewer.scene;
     scene.globe.enableLighting = false;
