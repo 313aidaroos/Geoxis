@@ -122,6 +122,15 @@ export class GeospatialMap {
       console.log("[map] diagnostic logging failed:", e);
     }
 
+    // Additional diagnostics for camera/geometry issue
+    try {
+      const pos = this.viewer.camera.position;
+      console.log("[map] camera.position (Cartesian3):", pos ? { x: pos.x, y: pos.y, z: pos.z } : null);
+      console.log("[map] globe.show:", this.viewer.scene.globe.show);
+    } catch (e) {
+      console.log("[map] extra diagnostic failed:", e);
+    }
+
     const scene = this.viewer.scene;
     scene.globe.enableLighting = false;
     scene.globe.baseColor = Cesium.Color.fromCssColorString("#0f1117");
