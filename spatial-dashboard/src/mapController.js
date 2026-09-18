@@ -150,7 +150,12 @@ export class GeospatialMap {
 
     this.#installPicking();
     this.#buildRiskZones();
-    this.setInitialCamera(false);
+    console.log("[map] calling setInitialCamera(false)");
+    try {
+      this.setInitialCamera(false);
+    } catch (err) {
+      console.error("[map] setInitialCamera threw:", err);
+    }
 
     await this.setGoogleTiles(googleMapsKey);
     this.#setStatus(this.#describeCamera());
@@ -227,20 +232,25 @@ export class GeospatialMap {
   /* ---------------------------------------------------------------- */
 
   setInitialCamera(animate = true) {
-    const { latitude, longitude } = this.origin;
-    // Place the camera south of the target so the 45° pitch looks north
-    // across the port; offset ≈ altitude / tan(45°).
-    const offsetDeg = (this.initialAltitude / 111_320) * 0.9;
-    const dest = Cesium.Cartesian3.fromDegrees(longitude, latitude - offsetDeg, this.initialAltitude);
-    const orientation = {
-      heading: Cesium.Math.toRadians(0),
-      pitch: Cesium.Math.toRadians(this.initialPitch),
-      roll: 0,
-    };
-    if (animate) {
-      this.viewer.camera.flyTo({ destination: dest, orientation, duration: 1.6 });
-    } else {
-      this.viewer.camera.setView({ destination: dest, orientation });
+    try {
+      const { latitude, longitude } = this.origin;
+      // Place the camera south of the target so the 45° pitch looks north
+      // across the port; offset ≈ altitude / tan(45°).
+      const offsetDeg = (this.initialAltitude / 111_320) * 0.9;
+      const dest = Cesium.Cartesian3.fromDegrees(longitude, latitude - offsetDeg, this.initialAltitude);
+      const orientation = {
+        heading: Cesium.Math.toRadians(0),
+        pitch: Cesium.Math.toRadians(this.initialPitch),
+        roll: 0,
+      };
+      if (animate) {
+        this.viewer.camera.flyTo({ destination: dest, orientation, duration: 1.6 });
+      } else {
+        this.viewer.camera.setView({ destination: dest, orientation });
+      }
+      console.log("[map] setInitialCamera succeeded with dest:", dest);
+    } catch (err) {
+      console.error("[map] setInitialCamera error:", err);
     }
   }
 
