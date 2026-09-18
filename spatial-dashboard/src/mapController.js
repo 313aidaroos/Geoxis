@@ -82,11 +82,13 @@ export class GeospatialMap {
       selectionIndicator: false,
       shouldAnimate: true,
       requestRenderMode: false,
-      // Default imagery: Cesium's bundled Natural Earth II tiles (no key).
-      baseLayer: Cesium.ImageryLayer.fromProviderAsync(
-        Cesium.TileMapServiceImageryProvider.fromUrl(
-          Cesium.buildModuleUrl("Assets/Textures/NaturalEarthII"),
-        ),
+      // OpenStreetMap raster tiles (free, no token, reliable in production)
+      baseLayer: new Cesium.ImageryLayer(
+        new Cesium.UrlTemplateImageryProvider({
+          url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+          maximumLevel: 19,
+          credit: "© OpenStreetMap contributors",
+        })
       ),
       terrain: undefined,
     });
@@ -324,7 +326,7 @@ export class GeospatialMap {
         },
         label: {
           text: metadata.name ?? id,
-          font: "500 12px 'IBM Plex Sans', sans-serif",
+          font: "500 12px 'Special Elite', monospace",
           fillColor: Cesium.Color.fromCssColorString("#e2e8f0"),
           showBackground: true,
           backgroundColor: Cesium.Color.fromCssColorString("#161922").withAlpha(0.85),
