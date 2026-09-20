@@ -153,8 +153,21 @@ export class GeospatialMap {
     console.log("[map] calling setInitialCamera(false)");
     try {
       this.setInitialCamera(false);
+      // Force an immediate render pass to trigger tile requests
+      this.viewer.scene.requestRender();
+      console.log("[map] requestRender() called after setInitialCamera");
     } catch (err) {
       console.error("[map] setInitialCamera threw:", err);
+    }
+
+    // Camera diagnostic AFTER setInitialCamera
+    try {
+      const c = this.viewer.camera.positionCartographic;
+      console.log('[map] AFTER setInitialCamera - lon/lat/height:', Cesium.Math.toDegrees(c.longitude), Cesium.Math.toDegrees(c.latitude), c.height);
+      const tilesToRender = this.viewer.scene.globe._surface?._tilesToRender?.length ?? "n/a";
+      console.log('[map] _tilesToRender.length AFTER camera move:', tilesToRender);
+    } catch (e) {
+      console.log("[map] post-camera diagnostic failed:", e);
     }
 
     await this.setGoogleTiles(googleMapsKey);
