@@ -67,8 +67,7 @@ export class GeospatialMap {
   /* ---------------------------------------------------------------- */
 
   async initialize({ googleMapsKey = "" } = {}) {
-    this.#setStatus("step1: initialize() entered");
-    console.log("[map] step1: initialize() entered");
+    this.#setStatus("Initializing globe…");
 
     this.viewer = new Cesium.Viewer(this.containerId, {
       animation: false,
@@ -84,56 +83,10 @@ export class GeospatialMap {
       shouldAnimate: true,
       requestRenderMode: false,
       terrain: undefined,
+      imageryProvider: await Cesium.ArcGisMapServerImageryProvider.fromUrl(
+        "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer"
+      ),
     });
-    this.#setStatus("step2: Viewer constructed");
-    console.log("[map] step2: Viewer constructed");
-
-    // Explicitly add Esri imagery layer after viewer creation (more reliable across builds)
-    let esriLayer;
-    try {
-      esriLayer = new Cesium.ImageryLayer(
-        new Cesium.UrlTemplateImageryProvider({
-          url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-          maximumLevel: 19,
-          credit: "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
-        })
-      );
-      this.viewer.imageryLayers.removeAll();
-      const addedLayer = this.viewer.imageryLayers.add(esriLayer);
-      console.log("[map] imageryLayers.add() returned:", addedLayer);
-      console.log("[map] layer.ready:", esriLayer.ready, "layer.show:", esriLayer.show);
-      this.#setStatus("Globe ready (Esri layer added)");
-    } catch (err) {
-      console.error("[map] Failed to add imagery layer:", err);
-      this.#setStatus("IMAGERY ERROR: " + (err?.message || err));
-    }
-    this.#setStatus("step3: past imagery layer block");
-    console.log("[map] step3: past imagery layer block");
-
-    // Diagnostic: check if Cesium thinks there is anything to render
-    try {
-      const cam = this.viewer.camera.positionCartographic;
-      console.log("[map] camera positionCartographic:", cam ? { lat: Cesium.Math.toDegrees(cam.latitude), lon: Cesium.Math.toDegrees(cam.longitude), height: cam.height } : null);
-      console.log("[map] globe.tilesLoaded:", this.viewer.scene.globe.tilesLoaded);
-      const surface = this.viewer.scene.globe._surface;
-      const tilesToRender = surface?._tilesToRender?.length ?? "n/a";
-      console.log("[map] _tilesToRender.length:", tilesToRender);
-    } catch (e) {
-      console.log("[map] diagnostic logging failed:", e);
-    }
-
-    // Additional diagnostics for camera/geometry issue
-    try {
-      const pos = this.viewer.camera.position;
-      console.log("[map] camera.position (Cartesian3):", pos ? { x: pos.x, y: pos.y, z: pos.z } : null);
-      console.log("[map] globe.show:", this.viewer.scene.globe.show);
-
-      // Precise numeric diagnostic
-      const c = this.viewer.camera.positionCartographic;
-      console.log('[map] cam lon/lat/height:', Cesium.Math.toDegrees(c.longitude), Cesium.Math.toDegrees(c.latitude), c.height, '| frustum near/far:', this.viewer.camera.frustum.near, this.viewer.camera.frustum.far, '| isNaN check:', isNaN(c.height));
-    } catch (e) {
-      console.log("[map] extra diagnostic failed:", e);
-    }
 
     const scene = this.viewer.scene;
     scene.globe.enableLighting = false;
@@ -150,25 +103,7 @@ export class GeospatialMap {
 
     this.#installPicking();
     this.#buildRiskZones();
-    console.log("[map] calling setInitialCamera(false)");
-    try {
-      this.setInitialCamera(false);
-      // Force an immediate render pass to trigger tile requests
-      this.viewer.scene.requestRender();
-      console.log("[map] requestRender() called after setInitialCamera");
-    } catch (err) {
-      console.error("[map] setInitialCamera threw:", err);
-    }
-
-    // Camera diagnostic AFTER setInitialCamera
-    try {
-      const c = this.viewer.camera.positionCartographic;
-      console.log('[map] AFTER setInitialCamera - lon/lat/height:', Cesium.Math.toDegrees(c.longitude), Cesium.Math.toDegrees(c.latitude), c.height);
-      const tilesToRender = this.viewer.scene.globe._surface?._tilesToRender?.length ?? "n/a";
-      console.log('[map] _tilesToRender.length AFTER camera move:', tilesToRender);
-    } catch (e) {
-      console.log("[map] post-camera diagnostic failed:", e);
-    }
+    this.setInitialCamera(false);
 
     await this.setGoogleTiles(googleMapsKey);
     this.#setStatus(this.#describeCamera());
@@ -245,25 +180,18 @@ export class GeospatialMap {
   /* ---------------------------------------------------------------- */
 
   setInitialCamera(animate = true) {
-    try {
-      const { latitude, longitude } = this.origin;
-      // Place the camera south of the target so the 45° pitch looks north
-      // across the port; offset ≈ altitude / tan(45°).
-      const offsetDeg = (this.initialAltitude / 111_320) * 0.9;
-      const dest = Cesium.Cartesian3.fromDegrees(longitude, latitude - offsetDeg, this.initialAltitude);
-      const orientation = {
-        heading: Cesium.Math.toRadians(0),
-        pitch: Cesium.Math.toRadians(this.initialPitch),
-        roll: 0,
-      };
-      if (animate) {
-        this.viewer.camera.flyTo({ destination: dest, orientation, duration: 1.6 });
-      } else {
-        this.viewer.camera.setView({ destination: dest, orientation });
-      }
-      console.log("[map] setInitialCamera succeeded with dest:", dest);
-    } catch (err) {
-      console.error("[map] setInitialCamera error:", err);
+    const { latitude, longitude } = this.origin;
+    const offsetDeg = (this.initialAltitude / 111_320) * 0.9;
+    const dest = Cesium.Cartesian3.fromDegrees(longitude, latitude - offsetDeg, this.initialAltitude);
+    const orientation = {
+      heading: Cesium.Math.toRadians(0),
+      pitch: Cesium.Math.toRadians(this.initialPitch),
+      roll: 0,
+    };
+    if (animate) {
+      this.viewer.camera.flyTo({ destination: dest, orientation, duration: 1.6 });
+    } else {
+      this.viewer.camera.setView({ destination: dest, orientation });
     }
   }
 
