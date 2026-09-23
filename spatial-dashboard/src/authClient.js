@@ -36,9 +36,11 @@ export async function config() {
   return res.json();
 }
 
-export async function requestMagicLink(email) {
+export async function requestMagicLink(email, next = "/") {
   const cfg = await config();
   if (!cfg.supabaseUrl || !cfg.supabaseAnonKey) throw new Error("auth_not_configured");
+  const safeNext = next && next.startsWith("/") && !next.startsWith("//") ? next : "/";
+  const redirectTo = `${location.origin}/auth/callback.html?next=${encodeURIComponent(safeNext)}`;
   const res = await fetch(`${cfg.supabaseUrl}/auth/v1/otp`, {
     method: "POST",
     headers: { apikey: cfg.supabaseAnonKey, "Content-Type": "application/json" },
@@ -46,7 +48,7 @@ export async function requestMagicLink(email) {
       email,
       create_user: true,
       should_create_user: true,
-      email_redirect_to: `${location.origin}/login.html`,
+      email_redirect_to: redirectTo,
     }),
   });
   if (!res.ok) throw new Error("magic_link_failed");

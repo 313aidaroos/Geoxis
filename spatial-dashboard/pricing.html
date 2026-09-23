@@ -93,7 +93,7 @@
       const me = await loadMe().catch(() => null);
       if (!me) {
         loadingState.textContent = "Sign in to redeem plans.";
-        setTimeout(() => location.href = "/login.html", 2000);
+        setTimeout(() => location.href = `/login.html?next=${encodeURIComponent(location.pathname + location.search)}`, 2000);
         return;
       }
       userEmail = me.user.email;

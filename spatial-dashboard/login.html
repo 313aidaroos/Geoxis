@@ -8,43 +8,104 @@
   <link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="min-h-screen bg-surface-0 text-slate-100 font-sans flex items-center justify-center p-6">
+<body class="min-h-screen bg-surface-0 text-slate-100 flex items-center justify-center p-6">
   <main class="w-full max-w-md rounded-2xl border border-line bg-surface-1 p-6 shadow-2xl">
     <a href="/" class="text-emerald-300 text-sm">← Geoxis globe</a>
     <h1 class="mt-4 text-2xl font-semibold">Sign in to Geoxis</h1>
-    <p class="mt-2 text-sm text-slate-400">Enter your email. Supabase sends a magic link; no password needed.</p>
-    <form id="loginForm" class="mt-6 space-y-3">
-      <input id="email" type="email" autocomplete="email" required placeholder="you@company.com" class="w-full h-11 px-3 rounded-md bg-surface-2 border border-line text-slate-100" />
+
+    <!-- Tabs -->
+    <div class="mt-6 flex border-b border-line">
+      <button id="tabMagic" class="px-4 py-2 text-sm font-medium border-b-2 border-emerald-500 text-emerald-300">Email me a link</button>
+      <button id="tabPassword" class="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200">Password</button>
+    </div>
+
+    <!-- Magic link form (default) -->
+    <form id="magicForm" class="mt-6 space-y-3">
+      <input id="emailMagic" type="email" autocomplete="email" required placeholder="you@company.com" class="w-full h-11 px-3 rounded-md bg-surface-2 border border-line text-slate-100" />
       <button class="w-full h-11 rounded-md bg-emerald-500 text-slate-950 font-medium">Send magic link</button>
     </form>
+
+    <!-- Password form (hidden) -->
+    <form id="passwordForm" class="mt-6 space-y-3 hidden">
+      <input id="emailPassword" type="email" autocomplete="email" required placeholder="you@company.com" class="w-full h-11 px-3 rounded-md bg-surface-2 border border-line text-slate-100" />
+      <input id="password" type="password" autocomplete="current-password" required placeholder="Password" class="w-full h-11 px-3 rounded-md bg-surface-2 border border-line text-slate-100" />
+      <button class="w-full h-11 rounded-md bg-emerald-500 text-slate-950 font-medium">Sign in</button>
+    </form>
+
     <p id="status" class="mt-4 text-sm text-slate-400"></p>
-    <div id="session" class="hidden mt-5 rounded-lg bg-surface-2 p-3 text-sm"></div>
   </main>
   <script type="module">
-    import { consumeAuthHash, requestMagicLink, loadMe, clearSession } from "/src/authClient.js";
+    import { consumeAuthHash, requestMagicLink, clearSession } from "/src/authClient.js";
+
+    const tabMagic = document.getElementById("tabMagic");
+    const tabPassword = document.getElementById("tabPassword");
+    const magicForm = document.getElementById("magicForm");
+    const passwordForm = document.getElementById("passwordForm");
     const status = document.getElementById("status");
-    const session = document.getElementById("session");
-    async function refresh() {
-      consumeAuthHash();
-      const me = await loadMe().catch(() => null);
-      if (me) {
-        session.classList.remove("hidden");
-        session.innerHTML = `Signed in as <b>${me.user.email}</b><br>Tenant: ${me.tenant.name}<br>Role: ${me.role}<br><button id="out" class="mt-3 text-red-300">Sign out</button>`;
-        document.getElementById("out").onclick = () => { clearSession(); location.reload(); };
-        status.textContent = "";
-      }
-    }
-    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+
+    // Parse next parameter
+    const params = new URLSearchParams(location.search);
+    const next = params.get("next");
+    const safeNext = next && next.startsWith("/") && !next.startsWith("//") ? next : "/";
+
+    // Tab switching
+    tabMagic.onclick = () => {
+      tabMagic.classList.add("border-emerald-500", "text-emerald-300");
+      tabMagic.classList.remove("border-transparent", "text-slate-400");
+      tabPassword.classList.remove("border-emerald-500", "text-emerald-300");
+      tabPassword.classList.add("border-transparent", "text-slate-400");
+      magicForm.classList.remove("hidden");
+      passwordForm.classList.add("hidden");
+      status.textContent = "";
+    };
+
+    tabPassword.onclick = () => {
+      tabPassword.classList.add("border-emerald-500", "text-emerald-300");
+      tabPassword.classList.remove("border-transparent", "text-slate-400");
+      tabMagic.classList.remove("border-emerald-500", "text-emerald-300");
+      tabMagic.classList.add("border-transparent", "text-slate-400");
+      passwordForm.classList.remove("hidden");
+      magicForm.classList.add("hidden");
+      status.textContent = "";
+    };
+
+    // Magic link submission
+    magicForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       status.textContent = "Sending magic link…";
       try {
-        await requestMagicLink(document.getElementById("email").value);
+        await requestMagicLink(document.getElementById("emailMagic").value, safeNext);
         status.textContent = "Check your email for the Geoxis magic link.";
-      } catch {
-        status.textContent = "Login is not configured yet. Try again after deployment env is active.";
+      } catch (err) {
+        status.textContent = err.message || "Login failed.";
       }
     });
-    refresh();
+
+    // Password submission
+    passwordForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      status.textContent = "Signing in…";
+      const email = document.getElementById("emailPassword").value;
+      const password = document.getElementById("password").value;
+
+      try {
+        const cfg = await fetch("/api/config", { cache: "no-store" }).then(r => r.json());
+        const { createClient } = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
+        const supabase = createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
+
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+
+        // Store token and redirect
+        localStorage.setItem("geoxis.session.access_token", data.session.access_token);
+        location.href = safeNext;
+      } catch (err) {
+        status.textContent = err.message || "Invalid email or password.";
+      }
+    });
+
+    // Consume any hash-based token on page load
+    consumeAuthHash();
   </script>
 </body>
 </html>
