@@ -83,6 +83,14 @@ export async function redeem(opts) {
     const receipt = await capture(held.reservationId);
     return { ok: true, receiptId: receipt.receiptId, entitlementId: receipt.entitlementId, result };
   } catch (err) {
+    // Capture failed after provision — undo the provision before releasing hold
+    if (opts.unprovision) {
+      try {
+        await opts.unprovision();
+      } catch (unprovErr) {
+        console.error("[wallet] unprovision failed:", unprovErr);
+      }
+    }
     try {
       await release(held.reservationId);
     } catch { /* release failed; auto-release will kick in */ }

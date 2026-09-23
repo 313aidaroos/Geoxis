@@ -108,6 +108,7 @@
           return;
         }
         const productKey = btn.dataset.product;
+        const attemptId = crypto.randomUUID(); // Unique per click; retry uses same UUID
         btn.disabled = true;
         btn.textContent = "Redeeming...";
         status.textContent = "";
@@ -116,7 +117,7 @@
           const res = await fetch("/api/redeem", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ productKey }),
+            body: JSON.stringify({ productKey, attemptId }),
           });
           const data = await res.json();
           if (res.status === 402) {

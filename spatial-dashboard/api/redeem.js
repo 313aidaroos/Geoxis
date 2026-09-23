@@ -22,26 +22,41 @@ export default async function handler(req, res) {
 
   try {
     const body = await readBody(req);
-    const { productKey } = body;
+    const { productKey, attemptId } = body;
 
     if (!productKey || typeof productKey !== "string") {
       return sendJson(res, 400, { error: "missing_product_key" });
     }
 
+    if (!attemptId || typeof attemptId !== "string" || attemptId.length > 80) {
+      return sendJson(res, 400, { error: "invalid_attempt_id", message: "attemptId required, max 80 chars" });
+    }
+
     // Use verified email as owner identity (not uid, which differs per Supabase project)
     const ownerEmail = ctx.user.email;
-    const idempotencyKey = `geoxis-${ctx.user.id}-${productKey}-${Date.now()}`;
+    // Idempotency key: user + product + client attemptId (stable per click retry)
+    const idempotencyKey = `geoxis-${ctx.user.id.slice(0, 8)}-${productKey}-${attemptId}`.slice(0, 80);
 
     const result = await redeem({
       ownerEmail,
       productKey,
       idempotencyKey,
       provision: async () => {
-        // Provision logic: create subscription row, grant entitlement
-        // For now, just succeed (actual provisioning logic goes here)
+        // TODO: Write entitlement/subscription row here
         return { success: true };
       },
+      unprovision: async () => {
+        // TODO: Delete the entitlement/subscription row written in provision
+      },
     });
+
+    if (!result.ok) {
+      return sendJson(res, 402, {
+        error: "insufficient_ixis",
+        message: result.message || "Not enough Ixis.",
+        needed: result.needed,
+      });
+    }
 
     return sendJson(res, 200, {
       success: true,
@@ -49,7 +64,6 @@ export default async function handler(req, res) {
       message: "Plan activated successfully!",
     });
   } catch (err) {
-    // Wallet client throws WalletError with status + body
     if (err.status === 402) {
       return sendJson(res, 402, {
         error: "insufficient_ixis",
