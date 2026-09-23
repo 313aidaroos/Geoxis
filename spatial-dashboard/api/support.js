@@ -1,5 +1,6 @@
 import { validateTicket } from "../lib/core.js";
 import { authContext, createSupportTicket, sendJson, envConfig } from "../lib/supabaseServer.js";
+import { clientIp, rateLimited } from "../lib/rateLimit.js";
 
 async function readBody(req) {
   if (req.body && typeof req.body === "object") return req.body;
@@ -18,6 +19,9 @@ export default async function handler(req, res) {
     return;
   }
   if (req.method !== "POST") return sendJson(res, 405, { error: "method_not_allowed" });
+  if (rateLimited(`support:${clientIp(req)}`, 5, 10 * 60 * 1000)) {
+    return sendJson(res, 429, { error: "rate_limited", message: "Too many requests. Please wait a few minutes." });
+  }
 
   try {
     const body = await readBody(req);
