@@ -9,6 +9,10 @@ async function readBody(req) {
   return text ? JSON.parse(text) : {};
 }
 
+// The geoxis.* plans are not in the Wallet catalog yet and provision writes no access row.
+// Flip to true only when both exist, so nobody is charged for access we don't deliver.
+const PLANS_ON_SALE = false;
+
 export default async function handler(req, res) {
   if (req.method !== "POST") return sendJson(res, 405, { error: "method_not_allowed" });
 
@@ -26,6 +30,10 @@ export default async function handler(req, res) {
 
     if (!productKey || typeof productKey !== "string") {
       return sendJson(res, 400, { error: "missing_product_key" });
+    }
+
+    if (!PLANS_ON_SALE) {
+      return sendJson(res, 409, { error: "not_on_sale", message: "Geoxis plans open soon. Nothing was charged." });
     }
 
     if (!attemptId || typeof attemptId !== "string" || attemptId.length > 80) {

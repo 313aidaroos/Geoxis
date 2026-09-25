@@ -1,6 +1,7 @@
 import { cixyRequest } from "../lib/core.js";
 import { authContext, listTenantAssets, sendJson, envConfig } from "../lib/supabaseServer.js";
 import { snapshot } from "../lib/fleetEngine.js";
+import { clientIp, rateLimited } from "../lib/rateLimit.js";
 
 async function readBody(req) {
   if (req.body && typeof req.body === "object") return req.body;
@@ -19,8 +20,14 @@ export default async function handler(req, res) {
     const body = await readBody(req);
     let ctx = null;
     let assets = [];
-    if (req.headers.authorization || req.headers.Authorization) {
+    const signedIn = Boolean(req.headers.authorization || req.headers.Authorization);
+    // Public demo chat is capped harder than signed-in tenants.
+    if (rateLimited(`cixy:${clientIp(req)}`, signedIn ? 60 : 15, 10 * 60 * 1000)) {
+      return sendJson(res, 429, { error: "rate_limited", message: "Too many messages. Please wait a few minutes." });
+    }
+    if (signedIn) {
       ctx = await authContext(req);
+      if (!ctx) return sendJson(res, 401, { error: "unauthorized" });
       assets = await listTenantAssets(ctx.tenant.id);
     } else {
       const live = await snapshot();
