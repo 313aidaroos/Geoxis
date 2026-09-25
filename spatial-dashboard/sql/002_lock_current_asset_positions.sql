@@ -1,3 +1,4 @@
+-- Change note (Claude, Sep 2026): View is `security_invoker`; browser roles revoked (closed cross-customer read). See docs/LAUNCH_NOTES.md.
 -- SECURITY: current_asset_positions ran as its owner (bypassing RLS) and anon/authenticated
 -- could SELECT it, exposing every tenant's asset positions. The dashboard reads it with the
 -- service role filtered by tenant (lib/supabaseServer.js). Applied live 2026-09-23.

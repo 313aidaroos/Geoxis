@@ -1,3 +1,4 @@
+// Change note (Claude, Sep 2026): 'Not on sale' instead of an error. See docs/LAUNCH_NOTES.md.
 import { authContext, sendJson } from "../lib/supabaseServer.js";
 import { redeem, isWalletConfigured } from "../lib/apixis-wallet.js";
 

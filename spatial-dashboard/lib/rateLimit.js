@@ -1,3 +1,4 @@
+// Change note (Claude, Sep 2026): New. Per-IP limiter. See docs/LAUNCH_NOTES.md.
 // Per-instance limiter for endpoints that spend money (AI). Serverless instances do not share
 // memory: a speed bump against scripted abuse, not a global quota.
 const buckets = new Map();

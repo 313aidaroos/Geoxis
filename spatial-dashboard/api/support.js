@@ -1,3 +1,4 @@
+// Change note (Claude, Sep 2026): Rate limited. See docs/LAUNCH_NOTES.md.
 import { validateTicket } from "../lib/core.js";
 import { authContext, createSupportTicket, sendJson, envConfig } from "../lib/supabaseServer.js";
 import { clientIp, rateLimited } from "../lib/rateLimit.js";

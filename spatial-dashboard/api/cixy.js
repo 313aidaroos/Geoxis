@@ -1,3 +1,4 @@
+// Change note (Claude, Sep 2026): Rate limited. See docs/LAUNCH_NOTES.md.
 import { cixyRequest } from "../lib/core.js";
 import { authContext, listTenantAssets, sendJson, envConfig } from "../lib/supabaseServer.js";
 import { snapshot } from "../lib/fleetEngine.js";
