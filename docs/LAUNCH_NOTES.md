@@ -29,6 +29,8 @@ App `geoxis`. Catalog has `geoxis.tracking.*`. Redeem answers 'not on sale' unti
 
 ## What changed, file by file
 
+Each changed backend code file also starts with a one-line `Change note (Claude, Sep 2026)` comment saying the same thing.
+
 | File | Change |
 |---|---|
 | `docs/LAUNCH_NOTES.md` | This file. |
