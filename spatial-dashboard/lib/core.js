@@ -83,7 +83,7 @@ export function cixyRequest({ apiKey, messages, context }) {
   return {
     status: 200,
     body: {
-      model: "claude-sonnet-4-5",
+      model: "claude-sonnet-4-20250514",
       max_tokens: 700,
       system: cixySystemPrompt(context),
       messages: clean,
