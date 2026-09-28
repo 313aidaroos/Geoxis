@@ -1,11 +1,28 @@
 {
-  "alias": ["spatial-dashboard-xi.vercel.app"],
+  "alias": [
+    "spatial-dashboard-xi.vercel.app"
+  ],
   "headers": [
     {
       "source": "/api/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "no-store" }]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
+      ]
     }
   ],
   "cleanUrls": true,
-  "trailingSlash": false
+  "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/auth/apixis/start",
+      "destination": "/api/auth/apixis/start"
+    },
+    {
+      "source": "/auth/apixis/callback",
+      "destination": "/api/auth/apixis/callback"
+    }
+  ]
 }
