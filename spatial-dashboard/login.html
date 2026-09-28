@@ -33,6 +33,9 @@
     </form>
 
     <p id="status" class="mt-4 text-sm text-slate-400"></p>
+
+    <!-- Sign in with Apixis (2026-09-27, Grok Bot): one Apixis ID + your Wallet balance across the family -->
+    <a id="apixisSignIn" href="/auth/apixis/start" class="mt-4 flex w-full h-11 items-center justify-center rounded-md border border-emerald-500/40 bg-emerald-500/10 text-emerald-300 font-medium hover:bg-emerald-500/20">Sign in with Apixis</a>
   </main>
   <script type="module">
     import { consumeAuthHash, requestMagicLink, clearSession } from "/src/authClient.js";
@@ -104,8 +107,12 @@
       }
     });
 
-    // Consume any hash-based token on page load
-    consumeAuthHash();
+    document.getElementById("apixisSignIn").href = "/auth/apixis/start?next=" + encodeURIComponent(safeNext);
+    const apixisError = params.get("error");
+    if (apixisError) status.textContent = "Apixis sign-in did not finish (" + apixisError + "). Try again.";
+
+    // Consume any hash-based token on page load (magic link, or Sign in with Apixis → go straight to next)
+    if (consumeAuthHash()) location.replace(safeNext);
   </script>
 </body>
 </html>

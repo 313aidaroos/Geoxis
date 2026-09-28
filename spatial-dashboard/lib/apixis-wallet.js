@@ -97,3 +97,43 @@ export async function redeem(opts) {
     throw err;
   }
 }
+
+// ---------------------------------------------------------------- SDK v3 additions (2026-09-27, Grok Bot)
+// JS port of ApixisWallet SDK v3 (lib/apixis-wallet.ts, 2026-09-23): Apixis ID sign-in + shared balance.
+// Existing functions above are unchanged (redeem still uses the verified email).
+
+const OWNER_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** owner = Apixis ID `sub` (preferred) or the VERIFIED email from this site's session. */
+export function ownerQuery(owner) {
+  const value = String(owner || "").trim();
+  return OWNER_UUID.test(value) ? `owner_id=${encodeURIComponent(value)}` : `owner_email=${encodeURIComponent(value)}`;
+}
+
+/** The person's ONE family balance ({ currency, available, paid, bonus, reserved, usd, history }). */
+export async function walletBalance(owner, { history = 0 } = {}) {
+  const n = Math.max(0, Math.min(Number(history) || 0, 50));
+  return call("GET", `/api/v1/balance?${ownerQuery(owner)}&history=${n}`);
+}
+
+/** Where to send the browser to sign in. `state` must also be kept in an httpOnly cookie. */
+export function apixisLoginUrl({ state, redirectUri, clientId }) {
+  const u = new URL(`${BASE}/sso/authorize`);
+  u.searchParams.set("client_id", clientId ?? process.env.APIXIS_CLIENT_ID ?? "geoxis");
+  u.searchParams.set("redirect_uri", redirectUri);
+  u.searchParams.set("state", state);
+  return u.toString();
+}
+
+/** Server side, in the callback: trade the one-time `code` for { sub, email, email_verified }. Single use. */
+export async function exchangeLoginCode(code, redirectUri) {
+  return call("POST", "/api/sso/token", { code, redirect_uri: redirectUri });
+}
+
+/** "Buy Ixis" link; the Wallet sends the person back to `returnUrl`. */
+export function buyIxisUrl(product, returnUrl) {
+  const u = new URL(`${BASE}/buy`);
+  u.searchParams.set("product", product);
+  u.searchParams.set("return_url", returnUrl);
+  return u.toString();
+}
