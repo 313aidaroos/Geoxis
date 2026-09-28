@@ -6,3 +6,14 @@ Grok Bot (Developer Bot hub + product leads) notes. Every change Grok Bot makes 
 - Vercel env: replaced `WALLET_API_KEY` with a per-product `apx_live_` key, added `APIXIS_CLIENT_ID=geoxis`, and left legacy `APIXIS_WALLET_API_KEY` present (name-only check); production was redeployed from the same product commit.
 - Cleanup status: the attempted deletion of legacy `APIXIS_WALLET_API_KEY` variables was stopped at about 22:45 CT; no deletion was made here.
 - Undo: restore `WALLET_API_KEY` to its legacy value and deactivate the `geoxis` client row.
+
+## 2026-09-27 — Apixis Wallet balance pill + Sign in with Apixis (Grok Bot)
+- **What (PR #5, merge ceca075):** header balance pill on every screen + "Sign in with Apixis" (Awad-approved, product side only). All under `spatial-dashboard/`:
+  - `lib/apixis-wallet.js`: appended SDK v3 `walletBalance`, `ownerQuery`, `apixisLoginUrl`, `exchangeLoginCode`, `buyIxisUrl` (existing functions/redeem unchanged).
+  - `lib/apixis-login.js` + `api/auth/apixis/start.js` / `callback.js`; `vercel.json` rewrites `/auth/apixis/start|callback` → `/api/auth/apixis/*`. Callback creates/finds the Supabase user (app_metadata.apixis_sub), verifies a magic-link token server-side and hands the session to `/login` via the URL hash; `login.html` now goes straight to `next` when a hash token is consumed, and has a "Sign in with Apixis" button.
+  - `api/wallet/balance.js` (Bearer session token): 401 `{signIn:true}` without a session; owner = Apixis `sub` when linked, else verified email.
+  - `src/walletPill.js` (script on index, support, admin): slim row under the sidebar logo on the globe; next to "← Geoxis globe" on support/admin. Refetch on focus / visibilitychange / pageshow.
+- **Verified:** prod READY; `/api/wallet/balance` → 401; `/auth/apixis/start` → 302 to Wallet `/sso/authorize?client_id=geoxis`.
+- **Heads-up (pre-existing, not changed):** magic links point at `/auth/callback.html`, which isn't in the Vite build (prod 404); `pricing.html` / `set-password.html` also aren't built.
+- **Undo:** `git revert -m 1 ceca075` (or revert PR #5).
+- No Wallet code, env/keys, Stripe, checkout or payment links changed.
