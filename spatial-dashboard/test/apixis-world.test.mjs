@@ -57,12 +57,13 @@ test("provisionApixisWorldAgent: no key → no network call; request shape match
       assert.equal(init.headers.authorization, `Bearer ${key}`);
       const body = JSON.parse(init.body);
       assert.deepEqual(body, { from: "geoxis", email: "a@b.co", email_verified: true, apixis_sub: "s" });
-      return { ok: true, status: 200, json: async () => ({ ok: true, created: false, starter_ixis: 200, agent: { id: "a1" }, enter_url: ENTER_URL }) };
+      return { ok: true, status: 200, json: async () => ({ ok: true, created: false, starter_ixis: 1000, agent: { id: "a1" }, enter_url: ENTER_URL }) };
     },
   });
   assert.equal(ok.ok, true);
   assert.equal(ok.created, false);
   assert.equal(ok.agent.id, "a1");
+  assert.equal(ok.starterIxis, 1000); // 1000 Ixis starter grant comes from Apixis.dev, never granted here
   const bad = await provisionApixisWorldAgent({ email: "a@b.co" }, { env: { APIXIS_WORLD_KEY: key }, fetchImpl: async () => ({ ok: false, status: 401, json: async () => ({ ok: false, error: "unauthorized" }) }) });
   assert.deepEqual(bad, { ok: false, status: 401, error: "unauthorized" });
 });

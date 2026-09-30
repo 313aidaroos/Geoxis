@@ -3,7 +3,7 @@
 //
 // On first Apixis ID sign-in (and as a retry on the header pill's balance call), the server asks
 // Apixis.dev POST /api/agent/provision (Bearer APIXIS_WORLD_KEY, from "geoxis") to create or reuse the
-// person's OWN world agent (default customizable Apixis body; Cixy stays the guide) with 200 starter
+// person's OWN world agent (default customizable Apixis body; Cixy stays the guide) with 1000 starter
 // Ixis once. The id is stored on the Supabase auth user's app_metadata (apixis_world_agent_at / _id /
 // _name; server-only, no migration), so later sign-ins skip the call. Apixis.dev is idempotent by
 // verified email (one citizen per email, one agent per citizen, one starter grant), so a retry or a
