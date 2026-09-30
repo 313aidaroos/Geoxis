@@ -1,5 +1,6 @@
 // Change note (Claude, Sep 2026): Rate limited. See docs/LAUNCH_NOTES.md.
 import { cixyRequest } from "../lib/core.js";
+import { cixyUnavailableReply } from "../lib/apixis-cixy.js";
 import { authContext, listTenantAssets, sendJson, envConfig } from "../lib/supabaseServer.js";
 import { snapshot } from "../lib/fleetEngine.js";
 import { clientIp, rateLimited } from "../lib/rateLimit.js";
@@ -47,7 +48,12 @@ export default async function handler(req, res) {
       body: JSON.stringify(reqSpec.body),
     });
     const data = await upstream.json();
-    if (!upstream.ok) return sendJson(res, upstream.status, { error: "anthropic_failed", detail: data?.error?.message || data?.error || data });
+    if (!upstream.ok) {
+      console.error("Anthropic API error:", upstream.status, data?.error?.type || "");
+      // Out of credit, rate limited or down: a calm sentence, never the vendor's error.
+      const fallback = cixyUnavailableReply(upstream.status);
+      return sendJson(res, fallback.status, { error: "cixy_unavailable", message: fallback.reply, reply: fallback.reply });
+    }
     const text = (data.content || []).map((p) => p?.text || "").join("\n").trim();
     return sendJson(res, 200, { text, usage: data.usage || null }, { "Cache-Control": "no-store" });
   } catch (err) {
