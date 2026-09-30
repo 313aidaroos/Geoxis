@@ -1,5 +1,4 @@
 // Automatic Apixis world agent provision endpoint (Geoxis, 2026-09-30)
-// Simplified: call Apixis.dev directly + manage metadata
 import { authContext, sendJson, envConfig } from "../lib/supabaseServer.js";
 
 function meta(user) {
@@ -78,35 +77,6 @@ async function provisionApixisWorldAgent(input) {
   }
 }
 
-async function ensureWorldAgent(user, deps, rolloutAt = "2026-09-28T05:00:00.000Z") {
-  if (!needsProvision(user, rolloutAt)) return worldAgentView(user, rolloutAt);
-  try {
-    const m = meta(user);
-    const displayName = str(user?.user_metadata?.full_name) ?? str(user?.user_metadata?.name);
-    const result = await deps.provision({
-      client: deps.client,
-      email: String(user.email),
-      apixisSub: str(m.apixis_sub),
-      displayName,
-    });
-    if (!result.ok) {
-      console.error("Apixis world agent provision failed:", result.error, result.status ?? "");
-      return worldAgentView(user, rolloutAt);
-    }
-    const next = {
-      ...m,
-      apixis_world_agent_at: (deps.now?.() ?? new Date()).toISOString(),
-      apixis_world_agent_id: result.agent?.id ?? null,
-      apixis_world_agent_name: result.agent?.name ?? null,
-    };
-    await deps.saveAppMetadata(user.id, next);
-    return worldAgentView({ ...user, app_metadata: next }, rolloutAt);
-  } catch (err) {
-    console.error("Apixis world agent provision error:", (err).message ?? "");
-    return worldAgentView(user, rolloutAt);
-  }
-}
-
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return sendJson(res, 405, { error: "method_not_allowed" });
@@ -121,27 +91,72 @@ export default async function handler(req, res) {
     const user = ctx.user;
     const cfg = envConfig();
 
-    // Service role client for saving metadata
+    // Check if already provisioned
+    const m = meta(user);
+    if (str(m.apixis_world_agent_at)) {
+      return sendJson(res, 200, {
+        ok: true,
+        status: worldAgentView(user).status,
+        agentName: m.apixis_world_agent_name,
+        showWelcome: false,
+        newAccount: isNewAccount(user),
+      });
+    }
+
+    // Provision if needed
+    if (!needsProvision(user)) {
+      return sendJson(res, 200, {
+        ok: true,
+        status: worldAgentView(user).status,
+        agentName: str(m.apixis_world_agent_name),
+        showWelcome: Boolean(!str(m.apixis_world_welcome_at) && isNewAccount(user)),
+        newAccount: isNewAccount(user),
+      });
+    }
+
+    // Call Apixis
+    const displayName = str(user?.user_metadata?.full_name) ?? str(user?.user_metadata?.name);
+    const provResult = await provisionApixisWorldAgent({
+      client: "geoxis",
+      email: String(user.email),
+      emailVerified: true,
+      apixisSub: str(m.apixis_sub),
+      displayName,
+    });
+
+    if (!provResult.ok) {
+      console.error("[world/provision] apixis call failed:", provResult.error);
+      return sendJson(res, 200, {
+        ok: true,
+        status: "invite",
+        agentName: null,
+        showWelcome: true,
+        newAccount: isNewAccount(user),
+      });
+    }
+
+    // Save to metadata
     const { createClient } = await import("@supabase/supabase-js");
     const supabaseAdmin = createClient(cfg.supabaseUrl, cfg.supabaseServiceRoleKey);
-
-    const result = await ensureWorldAgent(user, {
-      client: "geoxis",
-      provision: provisionApixisWorldAgent,
-      saveAppMetadata: async (userId, appMetadata) => {
-        const { error } = await supabaseAdmin.auth.admin.updateUserById(userId, {
-          app_metadata: appMetadata,
-        });
-        if (error) throw error;
-      },
+    const next = {
+      ...m,
+      apixis_world_agent_at: new Date().toISOString(),
+      apixis_world_agent_id: provResult.agent?.id ?? null,
+      apixis_world_agent_name: provResult.agent?.name ?? null,
+    };
+    const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(user.id, {
+      app_metadata: next,
     });
+    if (updateError) {
+      console.error("[world/provision] metadata save failed:", updateError);
+    }
 
     return sendJson(res, 200, {
       ok: true,
-      status: result.status,
-      agentName: result.agentName,
-      showWelcome: result.showWelcome,
-      newAccount: result.newAccount,
+      status: "ready",
+      agentName: provResult.agent?.name ?? null,
+      showWelcome: true,
+      newAccount: isNewAccount(user),
     });
   } catch (err) {
     console.error("[world/provision]", err);
