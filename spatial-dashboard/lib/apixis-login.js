@@ -119,7 +119,7 @@ export async function finishApixisLogin(req, res) {
     const verify = await fetch(`${cfg.url}/auth/v1/verify`, {
       method: "POST",
       headers: { apikey: cfg.anonKey, "Content-Type": "application/json" },
-      body: JSON.stringify({ type: "magiclink", token_hash: tokenHash }),
+      body: JSON.stringify({ type: "email", token_hash: tokenHash }),
     });
     const session = await verify.json().catch(() => ({}));
     if (!verify.ok || !session.access_token) return fail("session_error");

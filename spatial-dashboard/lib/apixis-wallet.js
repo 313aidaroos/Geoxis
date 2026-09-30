@@ -45,8 +45,14 @@ export async function quote(productKey) {
   return res.json();
 }
 
-export async function reserve(ownerEmail, productKey, idempotencyKey) {
-  return call("POST", "/api/v1/reservations", { productKey, idempotencyKey, owner_email: ownerEmail });
+/** owner = Apixis ID `sub` (a UUID → owner_id) or the VERIFIED email from this site's session (→ owner_email). */
+function ownerFields(owner) {
+  const value = String(owner || "").trim();
+  return OWNER_UUID.test(value) ? { owner_id: value } : { owner_email: value };
+}
+
+export async function reserve(owner, productKey, idempotencyKey) {
+  return call("POST", "/api/v1/reservations", { productKey, idempotencyKey, ...ownerFields(owner) });
 }
 
 export async function capture(reservationId) {
@@ -57,20 +63,21 @@ export async function release(reservationId) {
   return call("POST", `/api/v1/reservations/${reservationId}/release`);
 }
 
-export async function entitlements(ownerEmail, app) {
-  const r = await call("GET", `/api/v1/entitlements?app=${encodeURIComponent(app)}&owner_email=${encodeURIComponent(ownerEmail)}`);
+export async function entitlements(owner, app) {
+  const r = await call("GET", `/api/v1/entitlements?app=${encodeURIComponent(app)}&${ownerQuery(owner)}`);
   return r.entitlements ?? [];
 }
 
-export async function hasEntitlement(ownerEmail, app, productKey) {
-  const list = await entitlements(ownerEmail, app);
+export async function hasEntitlement(owner, app, productKey) {
+  const list = await entitlements(owner, app);
   return list.some((e) => e.product_key === productKey && e.status === "active");
 }
 
+/** opts.owner = Apixis ID `sub` or verified email; opts.ownerEmail is the SDK v2 name, still accepted. */
 export async function redeem(opts) {
   let held;
   try {
-    held = await reserve(opts.ownerEmail, opts.productKey, opts.idempotencyKey);
+    held = await reserve(opts.owner ?? opts.ownerEmail, opts.productKey, opts.idempotencyKey);
   } catch (e) {
     if (e instanceof WalletError && e.insufficient) {
       return { ok: false, insufficient: true, needed: e.body?.ixis ?? 0, message: e.message };
