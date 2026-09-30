@@ -28,3 +28,7 @@ Entry format:
 ## 2026-09-30 — Claude (branch claude/awesome-newton-3tygzi)
 - Changed: `spatial-dashboard/lib/apixis-wallet.js` `reserve`/`entitlements`/`redeem` take the Apixis ID `sub` or verified email (`owner_id` / `owner_email`); `spatial-dashboard/api/redeem.js` bills the Apixis `sub` first. `spatial-dashboard/lib/apixis-login.js` verifies with type `email` (D16). World kit re-synced.
 - Why: family backend pass per Awad's 2026-09-30 decisions (ApixisWallet/AGENTS.md §0c D11–D16; live board: ApixisWallet/docs/FAMILY_STATUS.md). One SDK, one login kit, one world kit — copied from canonical, never patched by hand.
+
+## 2026-09-30 (night pass) — Claude
+- Changed: Cixy prompt now starts with the shared family core from `lib/apixis-cixy` (copied from `ApixisWallet/sdk/apixis-cixy`); only the product role stays site-specific. Greeting policy is the family rule (match the person, never open with salaam). Provider failures (no key, out of credit, 429, 5xx) answer `cixyUnavailableReply()` — a calm sentence with HTTP 503/429, never the vendor error. (`spatial-dashboard/lib/core.js` + `api/cixy.js`.)
+- Why: Awad's overnight instruction — all backend and security done, one Cixy persona everywhere (ApixisWallet/docs/CIXY.md, sdk/apixis-cixy.*), agents on the same page (ApixisWallet/docs/FAMILY_STATUS.md).
