@@ -15,3 +15,7 @@ Entry format:
 ## 2026-09-28 — JunoAI
 - Changed: created this file
 - Why: owner's standing rule — every AI that touches this repo must log its changes here
+
+## 2026-09-29 — Geoxis Lead (Grok)
+- Changed: `spatial-dashboard/lib/apixis-world.js` (new), `lib/apixis-login.js`, `api/wallet/balance.js`, `src/walletPill.js`, `login.html`, `test/apixis-world.test.mjs` (new), `.env.example`; `WORKBOARD.md` (new), `NOTES/GROK.md`
+- Why: one Apixis ID = one Apixis Wallet = one Apixis world agent: provision the user's own world agent at first Apixis ID sign-in (idempotent, id stored in app_metadata), "Your agent is in the Apixis world" link next to the Wallet balance pill, "Log in with Apixis ID" as the main sign-in. Branch `geoxis-lead/one-account`, not merged.

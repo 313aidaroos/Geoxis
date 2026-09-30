@@ -17,3 +17,15 @@ Grok Bot (Developer Bot hub + product leads) notes. Every change Grok Bot makes 
 - **Heads-up (pre-existing, not changed):** magic links point at `/auth/callback.html`, which isn't in the Vite build (prod 404); `pricing.html` / `set-password.html` also aren't built.
 - **Undo:** `git revert -m 1 ceca075` (or revert PR #5).
 - No Wallet code, env/keys, Stripe, checkout or payment links changed.
+
+## 2026-09-29 (CT) — One Apixis ID = one Wallet = one world agent (Geoxis Lead (Grok))
+- **What (branch `geoxis-lead/one-account`, PR not merged, not deployed):** all under `spatial-dashboard/`:
+  - `lib/apixis-world.js` (new): JS port of Apixis.dev `sdk/apixis-world-provision.ts` + Renoxis `lib/renoxis/world-agent.ts`. Calls `POST https://www.apixis.dev/api/agent/provision` (Bearer `APIXIS_WORLD_KEY`, `from: "geoxis"`) and stores `apixis_world_agent_at` / `_id` / `_name` on the Supabase auth user's **app_metadata** (server-only; no migration, no table change). Skips when the id is already stored; Apixis.dev is idempotent by verified email, so never a second agent or a second 200-Ixis grant.
+  - `lib/apixis-login.js`: the Apixis ID callback provisions on first sign-in. On Vercel **preview** only, the sign-in round trip stays on `VERCEL_BRANCH_URL` (prod unchanged).
+  - `api/wallet/balance.js`: returns `agent { ready, id, name, enterUrl }` and retries provisioning if the first sign-in could not.
+  - `src/walletPill.js`: "Your agent is in the Apixis world ↗" (→ `https://www.apixis.dev/enter?from=geoxis`) next to the balance pill; "Log in with Apixis ID" label.
+  - `login.html`: "Log in with Apixis ID" is the primary button at the top; email options stay below for existing accounts.
+  - `test/apixis-world.test.mjs`, `.env.example` (`APIXIS_WORLD_KEY`). Repo `WORKBOARD.md` created.
+- **Needs from hub:** `APIXIS_WORLD_KEY` is NOT set on Vercel `spatial-dashboard` (Apixis.dev already has `geoxis` in `APIXIS_WORLD_KEYS`: a probe returns 401 not 503). Until it is set, no agent is provisioned (header links to /enter, which creates it).
+- **No** Wallet code/settings, Stripe, env vars, protection settings or DB changes.
+- **Undo:** close the PR / delete the branch; after a merge, revert the merge commit. Stored app_metadata keys are harmless and can be left or cleared.

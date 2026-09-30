@@ -5,10 +5,16 @@
 import { randomBytes } from "node:crypto";
 import { apixisLoginUrl, exchangeLoginCode } from "./apixis-wallet.js";
 import { envConfig } from "./supabaseServer.js";
+import { ensureWorldAgent } from "./apixis-world.js";
 
 const STATE_COOKIE = "apixis_login";
 
 export function siteUrl() {
+  // 2026-09-29 (Grok, Geoxis Lead): on a Vercel PREVIEW, stay on the preview's stable branch URL so the
+  // sign-in round trip is testable there (its callback must be registered with the Wallet). Prod unchanged.
+  if (process.env.VERCEL_ENV === "preview" && process.env.VERCEL_BRANCH_URL && !process.env.APIXIS_REDIRECT_URI) {
+    return `https://${process.env.VERCEL_BRANCH_URL}`;
+  }
   return (process.env.APP_URL || "https://spatial-dashboard-xi.vercel.app").replace(/\/$/, "");
 }
 
@@ -123,6 +129,12 @@ export async function finishApixisLogin(req, res) {
     });
     const session = await verify.json().catch(() => ({}));
     if (!verify.ok || !session.access_token) return fail("session_error");
+
+    // 2026-09-29 (Grok, Geoxis Lead): first sign-in → this Apixis ID's own world agent (once; idempotent).
+    if (session.user?.id) {
+      const user = { ...session.user, app_metadata: { ...(session.user.app_metadata || {}), apixis_sub: identity.sub } };
+      await ensureWorldAgent(user);
+    }
 
     const next = safeLocalRedirect(saved.next || "/");
     const hash = new URLSearchParams({ access_token: session.access_token, expires_in: String(session.expires_in || 3600), type: "apixis" });

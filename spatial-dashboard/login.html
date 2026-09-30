@@ -13,6 +13,12 @@
     <a href="/" class="text-emerald-300 text-sm">← Geoxis globe</a>
     <h1 class="mt-4 text-2xl font-semibold">Sign in to Geoxis</h1>
 
+    <!-- Log in with Apixis ID (Wallet SSO) is THE way in (2026-09-29, Grok, Geoxis Lead): one Apixis ID =
+         one Wallet balance = one Apixis world agent across the family. Email options below are for existing
+         Geoxis accounts; the same email maps to the same account. -->
+    <a id="apixisSignIn" href="/auth/apixis/start" class="mt-6 flex w-full h-11 items-center justify-center rounded-md bg-emerald-500 text-slate-950 font-medium">Log in with Apixis ID</a>
+    <p class="mt-2 text-xs text-slate-500">Already have an Apixis ID from another Ixis site? Use it here; same account, same Ixis balance, same agent.</p>
+
     <!-- Tabs -->
     <div class="mt-6 flex border-b border-line">
       <button id="tabMagic" class="px-4 py-2 text-sm font-medium border-b-2 border-emerald-500 text-emerald-300">Email me a link</button>
@@ -22,20 +28,18 @@
     <!-- Magic link form (default) -->
     <form id="magicForm" class="mt-6 space-y-3">
       <input id="emailMagic" type="email" autocomplete="email" required placeholder="you@company.com" class="w-full h-11 px-3 rounded-md bg-surface-2 border border-line text-slate-100" />
-      <button class="w-full h-11 rounded-md bg-emerald-500 text-slate-950 font-medium">Send magic link</button>
+      <button class="w-full h-11 rounded-md border border-emerald-500/40 bg-emerald-500/10 text-emerald-300 font-medium hover:bg-emerald-500/20">Send magic link</button>
     </form>
 
     <!-- Password form (hidden) -->
     <form id="passwordForm" class="mt-6 space-y-3 hidden">
       <input id="emailPassword" type="email" autocomplete="email" required placeholder="you@company.com" class="w-full h-11 px-3 rounded-md bg-surface-2 border border-line text-slate-100" />
       <input id="password" type="password" autocomplete="current-password" required placeholder="Password" class="w-full h-11 px-3 rounded-md bg-surface-2 border border-line text-slate-100" />
-      <button class="w-full h-11 rounded-md bg-emerald-500 text-slate-950 font-medium">Sign in</button>
+      <button class="w-full h-11 rounded-md border border-emerald-500/40 bg-emerald-500/10 text-emerald-300 font-medium hover:bg-emerald-500/20">Sign in</button>
     </form>
 
     <p id="status" class="mt-4 text-sm text-slate-400"></p>
 
-    <!-- Sign in with Apixis (2026-09-27, Grok Bot): one Apixis ID + your Wallet balance across the family -->
-    <a id="apixisSignIn" href="/auth/apixis/start" class="mt-4 flex w-full h-11 items-center justify-center rounded-md border border-emerald-500/40 bg-emerald-500/10 text-emerald-300 font-medium hover:bg-emerald-500/20">Sign in with Apixis</a>
   </main>
   <script type="module">
     import { consumeAuthHash, requestMagicLink, clearSession } from "/src/authClient.js";
@@ -109,7 +113,7 @@
 
     document.getElementById("apixisSignIn").href = "/auth/apixis/start?next=" + encodeURIComponent(safeNext);
     const apixisError = params.get("error");
-    if (apixisError) status.textContent = "Apixis sign-in did not finish (" + apixisError + "). Try again.";
+    if (apixisError) status.textContent = "Apixis ID login did not finish (" + apixisError + "). Try again.";
 
     // Consume any hash-based token on page load (magic link, or Sign in with Apixis → go straight to next)
     if (consumeAuthHash()) location.replace(safeNext);
