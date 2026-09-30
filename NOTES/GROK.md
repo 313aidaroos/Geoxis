@@ -17,3 +17,9 @@ Grok Bot (Developer Bot hub + product leads) notes. Every change Grok Bot makes 
 - **Heads-up (pre-existing, not changed):** magic links point at `/auth/callback.html`, which isn't in the Vite build (prod 404); `pricing.html` / `set-password.html` also aren't built.
 - **Undo:** `git revert -m 1 ceca075` (or revert PR #5).
 - No Wallet code, env/keys, Stripe, checkout or payment links changed.
+
+## 2026-09-29 (CT) — "Other Ixis companies" footer (Geoxis Lead / Grok)
+- **What:** Awad-approved footer section linking the 13 other Ixis sites (Geoxis itself left out; Nexxis/Omnixis, Launchixis, PersonalContentBot, AwadBot, COMMAND excluded). Plain text links, `target="_blank" rel="noopener"`, wrap on narrow screens.
+- **Files:** `spatial-dashboard/src/ixisCompanies.js` (new: the single list + renderer into `[data-ixis-companies]`); `index.html` (small block at the bottom of the left sidebar, just above the feed-status bar, so nothing covers the map); `login.html`, `support.html`, `admin.html` (had no footer: minimal `<footer>` at the bottom of the existing card/main using the page's existing `border-line` / `text-slate-500` / `text-slate-400 hover:text-emerald-300` styles). Each page loads `/src/ixisCompanies.js`.
+- **Branch/PR:** `geoxis-lead/ixis-footer` — not merged, not deployed to production. No env, Supabase or Vercel settings touched.
+- **Undo:** revert the PR (or delete `src/ixisCompanies.js`, the four `<footer>…data-ixis-companies…</footer>` blocks and the four `<script src="/src/ixisCompanies.js">` tags).
