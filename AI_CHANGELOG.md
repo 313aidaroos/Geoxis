@@ -19,3 +19,4 @@ Entry format:
 ## 2026-09-29 — Grok (Geoxis Lead)
 - Changed: `spatial-dashboard/src/ixisCompanies.js` (new), `spatial-dashboard/index.html`, `login.html`, `support.html`, `admin.html`, `WORKBOARD.md`, `NOTES/GROK.md`
 - Why: Awad-approved "Other Ixis companies" footer links (branch `geoxis-lead/ixis-footer`, PR, not merged)
+- 2026-09-29 update (Grok, Geoxis Lead): removed Nursery Toons and Qahwah World from `spatial-dashboard/src/ixisCompanies.js` (Awad-approved), now 11 sites

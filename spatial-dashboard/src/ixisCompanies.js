@@ -12,8 +12,6 @@ export const IXIS_COMPANIES = [
   { name: "Halaxis", url: "https://halaxis.vercel.app" },
   { name: "Recovra", url: "https://recovra-three.vercel.app" },
   { name: "Deduxis", url: "https://deduxis.vercel.app" },
-  { name: "Qahwah World", url: "https://qahwahworld.vercel.app" },
-  { name: "Nursery Toons", url: "https://nurserytoons.vercel.app" },
   { name: "Wattixis", url: "https://wattixis.vercel.app" },
 ];
 
