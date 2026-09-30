@@ -9,7 +9,7 @@
  *     → https://www.apixis.dev/enter?from=socixis&next=%2Fworld.html%23market
  *
  * What happens: /enter → Apixis ID (Wallet sign-in, instant if already signed in) → Apixis.dev
- * creates or reuses the person's citizen + agent (default look, 200 starter Ixis once) → the world,
+ * creates or reuses the person's citizen + agent (default look, 1,000 starter Ixis once) → the world,
  * with a "Back to <product>" link for `from`.
  *
  * Products also create the agent automatically at signup with sdk/apixis-world-provision.ts (server only),

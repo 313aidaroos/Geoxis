@@ -41,13 +41,16 @@ export default async function handler(req, res) {
       return sendJson(res, 400, { error: "invalid_attempt_id", message: "attemptId required, max 80 chars" });
     }
 
-    // Use verified email as owner identity (not uid, which differs per Supabase project)
-    const ownerEmail = ctx.user.email;
+    // Billing identity: the Apixis ID `sub` saved at Apixis sign-in, else the verified email.
+    // Never the local uid — it differs per Supabase project.
+    const apixisSub = ctx.user.app_metadata?.apixis_sub;
+    const owner = typeof apixisSub === "string" && apixisSub ? apixisSub : ctx.user.email;
+    if (!owner) return sendJson(res, 401, { error: "email_not_verified" });
     // Idempotency key: user + product + client attemptId (stable per click retry)
     const idempotencyKey = `geoxis-${ctx.user.id.slice(0, 8)}-${productKey}-${attemptId}`.slice(0, 80);
 
     const result = await redeem({
-      ownerEmail,
+      owner,
       productKey,
       idempotencyKey,
       provision: async () => {

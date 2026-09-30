@@ -6,7 +6,7 @@
  * Call it once, right after a NEW account exists and its email is verified (first successful
  * signup / first sign-in). Keep a per-user flag (e.g. app_metadata.apixis_world_agent_at) so later
  * sign-ins skip the call; Apixis.dev is idempotent anyway (one citizen per email, one agent per
- * citizen, 200 starter Ixis once), so a retry never makes a second agent or a second grant.
+ * citizen, 1,000 starter Ixis once), so a retry never makes a second agent or a second grant.
  *
  *   const r = await provisionApixisWorldAgent({ client: "renoxis", email, apixisSub });
  *   if (r.ok) await markUser({ apixis_world_agent_at: new Date().toISOString(), apixis_world_agent_id: r.agent.id });
