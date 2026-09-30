@@ -1,5 +1,5 @@
-// Apixis world agent client (Geoxis Bot, 2026-09-30)
-// Call provisionIfNeeded() on first load after sign-in
+// Apixis world agent client (Geoxis, 2026-09-30)
+// Calls server provision endpoint and shows welcome card
 
 export async function provisionIfNeeded() {
   try {
@@ -9,7 +9,6 @@ export async function provisionIfNeeded() {
     });
 
     if (response.status === 401) {
-      // Not signed in, skip
       return { ok: false, needsSignIn: true };
     }
 
@@ -22,11 +21,14 @@ export async function provisionIfNeeded() {
 }
 
 export function showWelcomeCard(data) {
-  if (!data?.ok || !data?.agent) return;
+  if (!data?.ok || !data?.showWelcome) return;
 
   // Check if already shown this session
   if (sessionStorage.getItem("world_welcome_shown")) return;
   sessionStorage.setItem("world_welcome_shown", "1");
+
+  const agentName = data.agentName || "your agent";
+  const isReady = data.status === "ready";
 
   // Create welcome card matching Geoxis theme
   const card = document.createElement("div");
@@ -47,18 +49,20 @@ export function showWelcomeCard(data) {
     color: #e2e8f0;
   `;
 
+  const title = isReady ? "Your agent is ready" : "Welcome to Apixis";
+  const message = isReady
+    ? `<strong style="color: #10b981;">${agentName}</strong> is waiting for you in the Apixis world.`
+    : `Your avatar agent is being created. Enter the Apixis world to meet <strong style="color: #10b981;">${agentName}</strong>.`;
+
   card.innerHTML = `
     <div style="text-align: center;">
       <h2 style="margin: 0 0 12px 0; font-size: 24px; color: #10b981;">
-        ${data.created ? "Welcome to Apixis" : "Welcome back"}
+        ${title}
       </h2>
       <p style="margin: 0 0 24px 0; font-size: 14px; color: #94a3b8; line-height: 1.6;">
-        ${data.created ? 
-          `Your avatar agent <strong style="color: #10b981;">${data.agent.name}</strong> is ready with ${data.starter_ixis} starter Ixis.` :
-          `Your avatar agent <strong style="color: #10b981;">${data.agent.name}</strong> is waiting for you.`
-        }
+        ${message}
       </p>
-      <a href="${data.enter_url}" 
+      <a href="https://www.apixis.dev/enter?from=geoxis" 
          style="display: inline-block; padding: 12px 32px; background: #10b981; color: #0a0a0a; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 14px; margin-bottom: 12px;">
         Enter the Apixis world →
       </a>
