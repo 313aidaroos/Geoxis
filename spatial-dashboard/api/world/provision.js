@@ -2,6 +2,14 @@
 import { authContext, sendJson, envConfig } from "../lib/supabaseServer.js";
 import { provisionWorldAgent, hasWorldAgent } from "../lib/apixis-world.js";
 
+async function readBody(req) {
+  if (req.body && typeof req.body === "object") return req.body;
+  const chunks = [];
+  for await (const c of req) chunks.push(c);
+  const text = Buffer.concat(chunks).toString("utf8");
+  return text ? JSON.parse(text) : {};
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return sendJson(res, 405, { error: "method_not_allowed" });
@@ -9,7 +17,7 @@ export default async function handler(req, res) {
 
   try {
     // Must be signed in
-    const ctx = await authContext(req);
+    const ctx = await authContext(req).catch(() => null);
     if (!ctx) {
       return sendJson(res, 401, { error: "not_authenticated" });
     }
@@ -47,9 +55,9 @@ export default async function handler(req, res) {
     // Persist in user metadata so we don't provision twice
     const cfg = envConfig();
     const { createClient } = await import("@supabase/supabase-js");
-    const supabase = createClient(cfg.supabaseUrl, cfg.supabaseServiceRoleKey);
+    const supabaseAdmin = createClient(cfg.supabaseUrl, cfg.supabaseServiceRoleKey);
 
-    await supabase.auth.admin.updateUserById(user.id, {
+    const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(user.id, {
       app_metadata: {
         ...user.app_metadata,
         world_agent: {
@@ -60,6 +68,11 @@ export default async function handler(req, res) {
         },
       },
     });
+
+    if (updateError) {
+      console.error("[provision] failed to persist:", updateError);
+      // Still return success - provision happened even if metadata write failed
+    }
 
     return sendJson(res, 200, {
       ok: true,
