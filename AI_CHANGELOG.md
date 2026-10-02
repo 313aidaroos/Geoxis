@@ -40,3 +40,7 @@ Entry format:
 ## 2026-10-02 — Claude (Claude Code)
 - Changed: `.env.example` now lists every env var the code reads (missing names appended with a one-line note each; file created).
 - Why: so the owner can add keys in Vercel from one complete list. No code changed.
+
+## 2026-10-02 (late night) — Claude
+- Changed: new-account wording now says the Apixis world agent starts with **1,000** in-world Ixis (was 200). Apixis.dev really grants 1,000 (D11, `STARTER_IXIS_DEFAULTS.visitor`); shared world-kit comments changed identically in every copy.
+- Why: the site was telling new people the wrong number.
