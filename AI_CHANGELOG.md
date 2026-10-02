@@ -36,3 +36,7 @@ Entry format:
 ## 2026-10-01 (early) — Claude
 - Changed: `.github/workflows/ci.yml` — this repo had no CI on `main` (the shared-CI PR was never merged); it now calls `313aidaroos/github-actions/node-ci` on push/PR. `typecheck` script added where missing so CI type-checks (verified 0 errors, build green).
 - Why: overnight second pass — every repo must prove itself on every push. (spatial-dashboard/ subdirectory workflow.)
+
+## 2026-10-02 — Claude (Claude Code)
+- Changed: `.env.example` now lists every env var the code reads (missing names appended with a one-line note each; file created).
+- Why: so the owner can add keys in Vercel from one complete list. No code changed.
