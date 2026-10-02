@@ -16,3 +16,6 @@
 .ix-family-card:nth-child(13){--ix-scene:url("/companies/scenes-5.jpg");--ix-scene-x:0%;--ix-scene-time:14.2s}
 .ix-family-card:nth-child(14){--ix-scene:url("/companies/scenes-5.jpg");--ix-scene-x:50%;--ix-scene-time:15.6s}
 .ix-family-card:nth-child(15){--ix-scene:url("/companies/scenes-5.jpg");--ix-scene-x:100%;--ix-scene-time:10s}
+
+/* Reference sizing and the expense-recovery scene. */
+.ix-family h1{font-size:clamp(2rem,4.2vw,4.4rem);letter-spacing:-.03em;overflow-wrap:anywhere}.ix-family-card:nth-child(12){--ix-scene:url("/companies/recovra.jpg");--ix-scene-x:50%}.ix-family-card:nth-child(12) .ix-family-art::before{background-size:cover;background-position:center}@media(max-width:1100px){.ix-family-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:700px){.ix-family-grid{grid-template-columns:1fr}}
