@@ -46,4 +46,4 @@ Not clients: AwadBot, COMMAND.
 After a 200, show: "Your agent is ready. Enter the Apixis world" linking to
 `https://www.apixis.dev/enter?from=<client>`.
 
-Idempotent: second call returns `created: false` and does not grant another 200 starter Ixis.
+Idempotent: second call returns `created: false` and does not grant another 1,000 starter Ixis (granted once, on Apixis.dev).

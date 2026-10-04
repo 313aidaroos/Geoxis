@@ -1,10 +1,10 @@
-## 2026-10-04 summary
-## 2026-10-04 summary
+Grok Bot (Developer Bot hub + product leads) notes. Every change Grok Bot makes to this product (code, env, database, deploys) gets a dated entry here so Claude, Hermes and Codex stay on the same page.
 
-- **Grok:** added the two-owner admin allowlist and inserted the Gmail owner row in production.
-- **Claude/Hermes/Codex/Juno:** Claude, Hermes, and Juno had no commits or merged PRs in this repo on 2026-10-04 CT.
+## 2026-10-04 summary (corrected 2026-10-04 19:00 CT)
 
-
+- **Grok:** two-owner admin allowlist (PR #17), Gmail owner row in prod `admin_emails` (PR #18 note), notes catch-up (`dd294cc`, direct to main), and the claude-review-fixes PR (entry at the bottom).
+- **Claude:** PR #20 (notes only: `NOTES/CLAUDE.md` + `AI_CHANGELOG.md`), merged 18:31 CT. The earlier line here said Claude had no commits on 10-04; that was written before #20 merged.
+- **Hermes/Codex/Juno:** no commits or PRs in this repo since 2026-10-02.
 
 ## 2026-09-27 (CT) — Developer Bot (hub)
 - Wallet registration: added `geoxis` to `wallet_api_clients` in Supabase project `kzneeksminozmhnqaaun`, with `require_sso=false`.
@@ -170,3 +170,21 @@ The entries below record the day's observed commits and merged PRs. Existing det
 ### Merged PRs
 - PR #18, merge `9a477c6`, `grok/notes-admin-row` → `main`, merged 2026-10-04 CT by 313aidaroos: NOTES: gmail owner row added to prod admin_emails. Undo: `git revert 9a477c6`.
 - PR #17, merge `cd656ff`, `grok/owner-admin-allowlist` → `main`, merged 2026-10-04 CT by 313aidaroos: Owner admin allowlist for alaidaroosawad@gmail.com and awad@apixis.dev. Undo: `git revert cd656ff`.
+
+## 2026-10-04 (CT) — Grok: provenance for unlogged items since 2026-10-02
+- `dd294cc` (18:24 CT, 313aidaroos, **pushed straight to main, no PR**, during the freeze): "notes: 2026-10-04 catch-up", `NOTES/GROK.md` only. Side effect: it deleted this file's intro line and duplicated the "2026-10-04 summary" heading; both repaired in the claude-review-fixes PR. Who: Grok (catch-up job). Undo: `git revert dd294cc`.
+- PR #20 / `4c09ca2` (18:31 CT, branch `claude/great-fermi-6brq7a`): Claude's full-portfolio review, adds `NOTES/CLAUDE.md` + an `AI_CHANGELOG.md` line. Notes only, no code/env/DB. Who: Claude (Claude Code). Undo: `git revert 4c09ca2`.
+- Vercel env `ANTHROPIC_API_KEY` on project `spatial-dashboard` was updated 2026-10-04 12:00 CT by the 313aidaroos account (seen in env metadata; value not read). No note anywhere says who or why. Undo: hub knows the previous key, if needed.
+- Vercel env `ADMIN_EMAILS` created 17:44 CT (production + preview) — already logged under PR #17 above.
+
+## 2026-10-04 (CT) — Grok: claude-review-fixes (branch `geoxis-lead/claude-review-fixes`, one PR, NOT merged/deployed)
+- What / where:
+  1. `spatial-dashboard/api/world/provision.js`: import `../../lib/supabaseServer.js` (was `../lib/…`, which doesn't exist, so the function crashed on load: live GET/POST = 500 FUNCTION_INVOCATION_FAILED). Metadata save now uses the Supabase Auth admin REST endpoint with `envConfig().url/serviceKey` (it used `@supabase/supabase-js`, which isn't a dependency, and wrong field names). Error body no longer echoes `err.message`.
+  2. `spatial-dashboard/src/apixisWorld.js`: sends the session Bearer token (it sent none, so it always got 401); skips the call when signed out.
+  3. `spatial-dashboard/lib/core.js`: Cixy model = `process.env.AI_MODEL || "claude-sonnet-5"` (new `cixyModel()`); it was `claude-sonnet-4-20250514`, retired 2026-06-15 — live POST /api/cixy answered 503 "Cixy is resting".
+  4. `spatial-dashboard/lib/apixis-cixy.js`: removed the religious lines (Arab/Muslim culture, Salam / As-salamu alaykum, Insha'Allah / alhamdulillah, alcohol/pork/interest rules, "religious ruling", "whatever their faith") per Awad's no-religious-content lock. Kept hospitality, honesty, Ixis/Wallet rules. This Geoxis copy now differs from the canonical `ApixisWallet/docs/CIXY.md` text.
+  5. `spatial-dashboard/test/core.test.mjs`: tests that asserted the religious text now assert it's absent; new test for `cixyModel()`.
+  6. `spatial-dashboard/docs/PROVISION_KIT.md`: "200 starter Ixis" → 1,000 (granted once on Apixis.dev). `spatial-dashboard/admin.html`: subtitle names both owner emails (text only, same styling).
+- Not changed: the owner admin allowlist (already both emails since PR #17; `ADMIN_EMAILS` env holds both), Vercel env/protection, Supabase, Wallet, Stripe. No SVGs were removed: Claude added none since 10-02.
+- Who: Grok (Geoxis Lead), at Awad's request via the Developer Bot hub, 2026-10-04 18:43 CT.
+- Undo: close the PR without merging; after a merge, `git revert <squash SHA>`.
