@@ -1,10 +1,18 @@
-## 2026-10-04 summary
+Grok Bot (Developer Bot hub + product leads) notes. Every change Grok Bot makes to this product (code, env, database, deploys) gets a dated entry here so Claude, Hermes and Codex stay on the same page.
+
 ## 2026-10-04 summary
 
 - **Grok:** added the two-owner admin allowlist and inserted the Gmail owner row in production.
-- **Claude/Hermes/Codex/Juno:** Claude, Hermes, and Juno had no commits or merged PRs in this repo on 2026-10-04 CT.
+- **Claude:** merged PR #20 (`4c09ca2`) around 6:30 PM CT, adding the full-portfolio review to `NOTES/CLAUDE.md` and `AI_CHANGELOG.md` (notes/docs only).
+- **Hermes:** no 2026-10-04 commit or merged PR identified in this repository.
+- **Juno:** no 2026-10-04 commit or merged PR identified in this repository.
 
+## Catch-up correction — 2026-10-04 (CT)
 
+Claude activity was present; the earlier “no Claude activity” line was incorrect. Each item below has an undo pointer.
+
+- **Claude, 2026-10-04 6:31 PM CT — PR #20, merge `4c09ca24de0c37965000d171bb62187861060369`:** notes: Claude full-portfolio review 2026-10-04 (NOTES/CLAUDE.md, AI_CHANGELOG); added `NOTES/CLAUDE.md` and `AI_CHANGELOG.md` (notes/docs only). Undo: `git revert 4c09ca24de0c37965000d171bb62187861060369`.
+- **2026-10-04 6:31 PM CT — 313aidaroos:** `notes: Claude full-portfolio review 2026-10-04 (NOTES/CLAUDE.md, AI_CHANGELOG) (#20)` landed as `4c09ca24de0c37965000d171bb62187861060369`. Where: commit `4c09ca24de0c37965000d171bb62187861060369`. Undo: `git revert 4c09ca24de0c37965000d171bb62187861060369`.
 
 ## 2026-09-27 (CT) — Developer Bot (hub)
 - Wallet registration: added `geoxis` to `wallet_api_clients` in Supabase project `kzneeksminozmhnqaaun`, with `require_sso=false`.
