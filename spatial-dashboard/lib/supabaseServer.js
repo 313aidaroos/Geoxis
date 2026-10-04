@@ -94,7 +94,8 @@ export async function ensureUserTenant(user) {
 
   await upsert("profiles", { user_id: user.id, email, full_name: user.user_metadata?.full_name || null }, "user_id");
 
-  const admin = isOwner(email);
+  // Owner admin needs a confirmed email (any sign-in method: magic link, password, Apixis ID).
+  const admin = isOwner(email) && Boolean(user.email_confirmed_at);
   const slug = admin ? "geoxis-owner" : tenantSlugFor(email);
   let tenant = await selectOne("tenants", `slug=eq.${encodeURIComponent(slug)}&select=*`);
   if (!tenant) tenant = await insertOne("tenants", { slug, name: admin ? "Geoxis Owner" : slug.replaceAll("-", " ") });

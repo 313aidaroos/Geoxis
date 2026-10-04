@@ -116,3 +116,13 @@ test("cixy merges Muslim identity with domain expertise", () => {
   assert.match(prompt, /Truck 1/);
   assert.match(prompt, /Tenant: acme/);
 });
+
+test("owner admin allowlist: both owner emails, case-insensitive, ADMIN_EMAILS adds", async () => {
+  const { ownerAdminEmails } = await import("../lib/core.js");
+  assert.equal(isOwner("ALAIDAROOSAWAD@gmail.com"), true);
+  assert.equal(isOwner(" awad@apixis.dev "), true);
+  const list = ownerAdminEmails("Ops@Example.com, bad");
+  assert.ok(list.has("ops@example.com"));
+  assert.ok(!list.has("bad"));
+  assert.ok(list.has("alaidaroosawad@gmail.com"));
+});

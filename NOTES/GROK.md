@@ -141,3 +141,10 @@ Read-only backfill of everything that changed after the 2026-09-27 entries above
 - Where: main, `NOTES/GROK.md` only. Commit message `docs(notes): backfill NOTES/GROK.md through 2026-10-02 [notes only]`.
 - Who: Geoxis Lead / Grok.
 - Undo: `git revert <this commit>` (notes only).
+
+## 2026-10-04 (CT) — Grok: owner admin allowlist (alaidaroosawad@gmail.com, awad@apixis.dev)
+- What: Awad's rule — both owner emails are the Geoxis owner/admin as soon as they sign in with a verified email (magic link, password, Apixis ID). How it works: `isOwner(email)` (`spatial-dashboard/lib/core.js`) decides `ctx.admin`, which opens the owner support queue (`/api/admin/support`) and puts the person in the `geoxis-owner` tenant as `owner`; RLS `public.is_admin_user()` reads `public.admin_emails`. `isOwner` was only awad@apixis.dev; now both owner emails + optional `ADMIN_EMAILS` env (comma-separated), case-insensitive. `ensureUserTenant()` now also needs a confirmed email before granting admin. `sql/001_auth_support.sql` seeds both emails into `admin_emails`. Nobody else's access changed. No accounts or passwords were created.
+- Where: `spatial-dashboard/lib/core.js`, `spatial-dashboard/lib/supabaseServer.js`, `spatial-dashboard/sql/001_auth_support.sql`, `spatial-dashboard/test/core.test.mjs`; Vercel env `ADMIN_EMAILS` on project `spatial-dashboard` (production + preview).
+- Needs Awad: prod `public.admin_emails` still has only awad@apixis.dev (the app uses the service role, so the app side works for both now; only direct RLS reads differ). Run `insert into public.admin_emails (email, role) values ('alaidaroosawad@gmail.com','owner') on conflict (email) do update set role = excluded.role;` in the Geoxis Supabase SQL editor.
+- Who: Grok.
+- Undo: `git revert <squash SHA>` and delete `ADMIN_EMAILS` in Vercel → spatial-dashboard → Settings → Environment Variables.
