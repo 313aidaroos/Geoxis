@@ -99,14 +99,14 @@ test("cixy system prompt says none in view when empty", () => {
   assert.match(cixySystemPrompt({}), /none in view/);
 });
 
-test("cixy core: Arab and Muslim culture line, no religious greetings/phrases/rules (Awad's lock, 2026-10-04)", () => {
+test("cixy core: Arab culture line, no Muslim/religious greetings/phrases/rules (Awad's lock, 2026-10-04)", () => {
   const prompt = cixySystemPrompt({ tenant: "test", assets: [] });
-  assert.match(prompt, /draws on Arab and Muslim culture: warm hospitality, generosity, respect and directness/);
+  assert.match(prompt, /draws on Arab culture: warm hospitality, generosity, respect and directness/);
   assert.doesNotMatch(prompt, /salam|as-salamu|alaykum/i);
   assert.doesNotMatch(prompt, /insha'?allah|alhamdulillah|bismillah|masha'?allah/i);
   assert.doesNotMatch(prompt, /halal|haram|alcohol|pork|interest-based|gambling|prayer/i);
   assert.doesNotMatch(prompt, /religious ruling|scholar|fatwa/i);
-  assert.doesNotMatch(prompt, /Muslim AI|Muslim identity/i);
+  assert.doesNotMatch(prompt, /Muslim|Islam/i);
   assert.match(prompt, /never fabricate/);
 });
 

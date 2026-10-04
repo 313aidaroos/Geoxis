@@ -1,10 +1,18 @@
 Grok Bot (Developer Bot hub + product leads) notes. Every change Grok Bot makes to this product (code, env, database, deploys) gets a dated entry here so Claude, Hermes and Codex stay on the same page.
 
-## 2026-10-04 summary (corrected 2026-10-04 19:00 CT)
+## 2026-10-04 summary
 
-- **Grok:** two-owner admin allowlist (PR #17), Gmail owner row in prod `admin_emails` (PR #18 note), notes catch-up (`dd294cc`, direct to main), and the claude-review-fixes PR (entry at the bottom).
-- **Claude:** PR #20 (notes only: `NOTES/CLAUDE.md` + `AI_CHANGELOG.md`), merged 18:31 CT. The earlier line here said Claude had no commits on 10-04; that was written before #20 merged.
-- **Hermes/Codex/Juno:** no commits or PRs in this repo since 2026-10-02.
+- **Grok:** added the two-owner admin allowlist and inserted the Gmail owner row in production.
+- **Claude:** merged PR #20 (`4c09ca2`) around 6:30 PM CT, adding the full-portfolio review to `NOTES/CLAUDE.md` and `AI_CHANGELOG.md` (notes/docs only).
+- **Hermes:** no 2026-10-04 commit or merged PR identified in this repository.
+- **Juno:** no 2026-10-04 commit or merged PR identified in this repository.
+
+## Catch-up correction — 2026-10-04 (CT)
+
+Claude activity was present; the earlier “no Claude activity” line was incorrect. Each item below has an undo pointer.
+
+- **Claude, 2026-10-04 6:31 PM CT — PR #20, merge `4c09ca24de0c37965000d171bb62187861060369`:** notes: Claude full-portfolio review 2026-10-04 (NOTES/CLAUDE.md, AI_CHANGELOG); added `NOTES/CLAUDE.md` and `AI_CHANGELOG.md` (notes/docs only). Undo: `git revert 4c09ca24de0c37965000d171bb62187861060369`.
+- **2026-10-04 6:31 PM CT — 313aidaroos:** `notes: Claude full-portfolio review 2026-10-04 (NOTES/CLAUDE.md, AI_CHANGELOG) (#20)` landed as `4c09ca24de0c37965000d171bb62187861060369`. Where: commit `4c09ca24de0c37965000d171bb62187861060369`. Undo: `git revert 4c09ca24de0c37965000d171bb62187861060369`.
 
 ## 2026-09-27 (CT) — Developer Bot (hub)
 - Wallet registration: added `geoxis` to `wallet_api_clients` in Supabase project `kzneeksminozmhnqaaun`, with `require_sso=false`.
@@ -172,7 +180,8 @@ The entries below record the day's observed commits and merged PRs. Existing det
 - PR #17, merge `cd656ff`, `grok/owner-admin-allowlist` → `main`, merged 2026-10-04 CT by 313aidaroos: Owner admin allowlist for alaidaroosawad@gmail.com and awad@apixis.dev. Undo: `git revert cd656ff`.
 
 ## 2026-10-04 (CT) — Grok: provenance for unlogged items since 2026-10-02
-- `dd294cc` (18:24 CT, 313aidaroos, **pushed straight to main, no PR**, during the freeze): "notes: 2026-10-04 catch-up", `NOTES/GROK.md` only. Side effect: it deleted this file's intro line and duplicated the "2026-10-04 summary" heading; both repaired in the claude-review-fixes PR. Who: Grok (catch-up job). Undo: `git revert dd294cc`.
+- `dd294cc` (18:24 CT, 313aidaroos, **pushed straight to main, no PR**, during the freeze): "notes: 2026-10-04 catch-up", `NOTES/GROK.md` only. Side effect: it deleted this file's intro line and duplicated the "2026-10-04 summary" heading; repaired by `cca2d9e` below. Who: Grok (catch-up job). Undo: `git revert dd294cc`.
+- `cca2d9e` (18:53 CT, 313aidaroos, **pushed straight to main, no PR**, during the freeze): "notes: fix 10-04 catch-up", `NOTES/GROK.md` only; restored the intro line and corrected the Claude line. Who: Grok (catch-up job). Undo: `git revert cca2d9e`.
 - PR #20 / `4c09ca2` (18:31 CT, branch `claude/great-fermi-6brq7a`): Claude's full-portfolio review, adds `NOTES/CLAUDE.md` + an `AI_CHANGELOG.md` line. Notes only, no code/env/DB. Who: Claude (Claude Code). Undo: `git revert 4c09ca2`.
 - Vercel env `ANTHROPIC_API_KEY` on project `spatial-dashboard` was updated 2026-10-04 12:00 CT by the 313aidaroos account (seen in env metadata; value not read). Status: **unattributed, under hub review**. It looks family-wide (Deduxis and PersonalContentBot saw the same change), but who did it and why is unconfirmed. The key itself was not touched. Undo: none from here; the hub decides after its review.
 - Vercel env `ADMIN_EMAILS` created 17:44 CT (production + preview) — already logged under PR #17 above.
@@ -182,8 +191,8 @@ The entries below record the day's observed commits and merged PRs. Existing det
   1. `spatial-dashboard/api/world/provision.js`: import `../../lib/supabaseServer.js` (was `../lib/…`, which doesn't exist, so the function crashed on load: live GET/POST = 500 FUNCTION_INVOCATION_FAILED). Metadata save now uses the Supabase Auth admin REST endpoint with `envConfig().url/serviceKey` (it used `@supabase/supabase-js`, which isn't a dependency, and wrong field names). Error body no longer echoes `err.message`.
   2. `spatial-dashboard/src/apixisWorld.js`: sends the session Bearer token (it sent none, so it always got 401); skips the call when signed out.
   3. `spatial-dashboard/lib/core.js`: Cixy model = `process.env.AI_MODEL || "claude-sonnet-5"` (new `cixyModel()`); it was `claude-sonnet-4-20250514`, retired 2026-06-15 — live POST /api/cixy answered 503 "Cixy is resting".
-  4. `spatial-dashboard/lib/apixis-cixy.js`: per Awad's lock (corrected 2026-10-04 18:52 CT), the character still draws on Arab and Muslim culture. The line now reads "Your character draws on Arab and Muslim culture: warm hospitality, generosity, respect and directness." Removed (Halaxis-only): religious greetings (Salam / As-salamu alaykum), religious phrases (Insha'Allah / alhamdulillah), halal/religious rules (alcohol/pork/gambling/interest), the religious-ruling line, and the "faith" wording. Kept honesty and the Ixis/Wallet rules. This Geoxis copy now differs from the canonical `ApixisWallet/docs/CIXY.md` text.
-  5. `spatial-dashboard/test/core.test.mjs`: tests now require the culture line and assert that the banned greetings, phrases, rules, rulings and the labels "Muslim AI" / "Muslim identity" are absent (the word "Muslim" in the culture line is allowed). New test for `cixyModel()`.
+  4. `spatial-dashboard/lib/apixis-cixy.js`: the culture line now reads "Your character draws on Arab culture: warm hospitality, generosity, respect and directness." (changed 2026-10-04 ~19:00 CT on the hub's instruction from "Arab and Muslim culture"). Removed (Halaxis-only): the word "Muslim", religious greetings (Salam / As-salamu alaykum), religious phrases (Insha'Allah / alhamdulillah), halal/religious rules (alcohol/pork/gambling/interest), the religious-ruling line and the "faith" wording. Kept honesty and the Ixis/Wallet rules. This Geoxis copy now differs from the canonical `ApixisWallet/docs/CIXY.md` text.
+  5. `spatial-dashboard/test/core.test.mjs`: tests require the Arab culture line and assert that "Muslim"/"Islam", the banned greetings, phrases, rules and rulings are absent. New test for `cixyModel()`.
   6. `spatial-dashboard/docs/PROVISION_KIT.md`: "200 starter Ixis" → 1,000 (granted once on Apixis.dev). `spatial-dashboard/admin.html`: subtitle names both owner emails (text only, same styling).
 - Not changed: the owner admin allowlist (already both emails since PR #17; `ADMIN_EMAILS` env holds both), Vercel env/protection, Supabase, Wallet, Stripe. No SVGs were removed: Claude added none since 10-02.
 - Who: Grok (Geoxis Lead), at Awad's request via the Developer Bot hub, 2026-10-04 18:43 CT.
