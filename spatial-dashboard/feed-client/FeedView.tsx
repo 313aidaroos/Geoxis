@@ -89,7 +89,9 @@ export function FeedView({ client, skin, siteName }: { client: FeedClient; skin:
         <div className={cx("fx-tabs", skin.tabs)} role="navigation" aria-label="Feed">
           {tabs.map(([k, label]) => (
             <button key={k} type="button" className={cx(skin.tab, !overlay && tab === k && skin.tabActive)} aria-pressed={!overlay && tab === k}
-              onClick={() => { setOverlay(null); setFocusPost(null); setTab(k); }}>{label}</button>
+              onClick={() => { setOverlay(null); setFocusPost(null); setTab(k); }}>
+              {k === "search" ? <><span className="fx-tab-long">{label}</span><span className="fx-tab-short">Search</span></> : label}
+            </button>
           ))}
         </div>
         <button type="button" className={cx("fx-compose-btn", skin.button)} onClick={() => ctx.needSignIn("post") && setSheet({ type: "compose" })}>

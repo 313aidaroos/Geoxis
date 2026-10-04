@@ -28,6 +28,7 @@ body, * { font-family: 'Special Elite', monospace !important; }
 .fx-topbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
 .fx-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin: 0; padding: 0; }
 .fx-tabs button { white-space: nowrap; }
+.fx-tab-short { display: none; }
 .fx-layout { display: grid; grid-template-columns: minmax(0, 620px) minmax(240px, 300px); gap: var(--fx-gap, 14px); align-items: start; }
 .fx-layout-single { grid-template-columns: minmax(0, 680px); }
 .fx-main { min-width: 0; display: grid; gap: var(--fx-gap, 14px); }
@@ -119,4 +120,13 @@ html[data-fx-modal="open"] [data-floating-widget] { visibility: hidden !importan
   .fx-media video, .fx-media img { max-height: calc(100dvh - var(--fx-offset-mobile, 170px) - 190px); }
   .fx-sheet-wrap { place-items: end center; padding: 0; }
   .fx-sheet { width: 100%; max-height: 88dvh; }
+}
+@media (max-width: 560px) {
+  /* Phones: short "Search" label and tighter tabs so all four tabs (including "You") fit beside Post. */
+  .fx-tab-long { display: none; }
+  .fx-tab-short { display: inline; }
+  .fx-topbar { gap: 6px; }
+  .fx-topbar .fx-tabs { gap: 4px; }
+  .fx-topbar .fx-tabs button { padding: 7px 8px; font-size: 0.85em; }
+  .fx-compose-btn { padding-left: 10px; padding-right: 10px; }
 }
