@@ -148,3 +148,8 @@ Read-only backfill of everything that changed after the 2026-09-27 entries above
 - Needs Awad: prod `public.admin_emails` still has only awad@apixis.dev (the app uses the service role, so the app side works for both now; only direct RLS reads differ). Run `insert into public.admin_emails (email, role) values ('alaidaroosawad@gmail.com','owner') on conflict (email) do update set role = excluded.role;` in the Geoxis Supabase SQL editor.
 - Who: Grok.
 - Undo: `git revert <squash SHA>` and delete `ADMIN_EMAILS` in Vercel → spatial-dashboard → Settings → Environment Variables.
+
+## 2026-10-04 — Owner admin row in prod (Grok)
+- What: inserted ('alaidaroosawad@gmail.com','owner') into prod public.admin_emails on Supabase ncifprfgastofurrlsko via the MCP. Both owner emails are now present. Owner bypass check: Geoxis has no product paywalls to skip, since plans are not on sale (api/redeem.js returns not_on_sale) and nothing reads entitlements. No code change.
+- Who: Grok.
+- Undo: delete from public.admin_emails where email='alaidaroosawad@gmail.com';
