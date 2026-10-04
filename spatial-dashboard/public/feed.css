@@ -125,8 +125,10 @@ html[data-fx-modal="open"] [data-floating-widget] { visibility: hidden !importan
   /* Phones: short "Search" label and tighter tabs so all four tabs (including "You") fit beside Post. */
   .fx-tab-long { display: none; }
   .fx-tab-short { display: inline; }
-  .fx-topbar { gap: 6px; }
-  .fx-topbar .fx-tabs { gap: 4px; }
+  /* If a wide (e.g. monospace) site font still can't fit tabs + Post on one row, Post drops to its own row instead of covering "You". */
+  .fx-topbar { gap: 6px; flex-wrap: wrap; }
+  .fx-topbar .fx-tabs { gap: 4px; flex: 0 1 auto; min-width: auto; overflow: visible; }
+  .fx-compose-btn { margin-left: auto; }
   .fx-topbar .fx-tabs button { padding: 7px 8px; font-size: 0.85em; }
   .fx-compose-btn { padding-left: 10px; padding-right: 10px; }
 }
