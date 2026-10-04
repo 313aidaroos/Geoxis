@@ -122,7 +122,7 @@ create policy positions_member_select on public.asset_positions for select using
 drop policy if exists tickets_owner_or_admin_select on public.support_tickets;
 create policy tickets_owner_or_admin_select on public.support_tickets for select using (public.is_member(tenant_id) or public.is_admin_user());
 
-insert into public.admin_emails (email, role) values ('awad@apixis.dev', 'owner')
+insert into public.admin_emails (email, role) values ('awad@apixis.dev', 'owner'), ('alaidaroosawad@gmail.com', 'owner')
 on conflict (email) do update set role = excluded.role;
 
 insert into public.tenants (slug, name) values ('geoxis-demo', 'Geoxis Demo Operations')

@@ -14,8 +14,22 @@ export function normalizeEmail(input) {
   return EMAIL_RE.test(v) && v.length <= 254 ? v : null;
 }
 
+// Owner admin allowlist (Awad's rule, 2026-10-04 Grok): both owner emails are the Geoxis owner/admin.
+// ADMIN_EMAILS (comma-separated, Vercel env) adds to this fallback list. Case-insensitive.
+export const OWNER_ADMIN_EMAILS = Object.freeze(["alaidaroosawad@gmail.com", OWNER_EMAIL]);
+
+export function ownerAdminEmails(env = globalThis.process?.env?.ADMIN_EMAILS) {
+  const list = new Set(OWNER_ADMIN_EMAILS);
+  for (const raw of String(env ?? "").split(",")) {
+    const e = normalizeEmail(raw);
+    if (e) list.add(e);
+  }
+  return list;
+}
+
 export function isOwner(email) {
-  return normalizeEmail(email) === OWNER_EMAIL;
+  const e = normalizeEmail(email);
+  return Boolean(e) && ownerAdminEmails().has(e);
 }
 
 /** Tenant slug from email domain; personal mailboxes get a per-user tenant. */
