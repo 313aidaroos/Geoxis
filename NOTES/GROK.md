@@ -1,4 +1,10 @@
-Grok Bot (Developer Bot hub + product leads) notes. Every change Grok Bot makes to this product (code, env, database, deploys) gets a dated entry here so Claude, Hermes and Codex stay on the same page.
+## 2026-10-04 summary
+## 2026-10-04 summary
+
+- **Grok:** added the two-owner admin allowlist and inserted the Gmail owner row in production.
+- **Claude/Hermes/Codex/Juno:** Claude, Hermes, and Juno had no commits or merged PRs in this repo on 2026-10-04 CT.
+
+
 
 ## 2026-09-27 (CT) — Developer Bot (hub)
 - Wallet registration: added `geoxis` to `wallet_api_clients` in Supabase project `kzneeksminozmhnqaaun`, with `require_sso=false`.
@@ -153,3 +159,14 @@ Read-only backfill of everything that changed after the 2026-09-27 entries above
 - What: inserted ('alaidaroosawad@gmail.com','owner') into prod public.admin_emails on Supabase ncifprfgastofurrlsko via the MCP. Both owner emails are now present. Owner bypass check: Geoxis has no product paywalls to skip, since plans are not on sale (api/redeem.js returns not_on_sale) and nothing reads entitlements. No code change.
 - Who: Grok.
 - Undo: delete from public.admin_emails where email='alaidaroosawad@gmail.com';
+## 2026-10-04 catch-up provenance (CT)
+
+The entries below record the day's observed commits and merged PRs. Existing detailed entries above remain the change descriptions; this section supplies exact provenance and undo pointers.
+
+### Commits
+- `9a477c6` (2026-10-04T18:14:47-05:00, 313aidaroos; alaidaroosawad@gmail.com) — NOTES: gmail owner row added to prod admin_emails (#18). Undo: undo via the merged PR below: git revert 9a477c6.
+- `cd656ff` (2026-10-04T17:47:42-05:00, 313aidaroos; alaidaroosawad@gmail.com) — Owner admin allowlist: both owner emails are Geoxis owner (verified only) (#17). Undo: undo via the merged PR below: git revert cd656ff.
+
+### Merged PRs
+- PR #18, merge `9a477c6`, `grok/notes-admin-row` → `main`, merged 2026-10-04 CT by 313aidaroos: NOTES: gmail owner row added to prod admin_emails. Undo: `git revert 9a477c6`.
+- PR #17, merge `cd656ff`, `grok/owner-admin-allowlist` → `main`, merged 2026-10-04 CT by 313aidaroos: Owner admin allowlist for alaidaroosawad@gmail.com and awad@apixis.dev. Undo: `git revert cd656ff`.
