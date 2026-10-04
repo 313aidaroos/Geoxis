@@ -1,5 +1,19 @@
 Grok Bot (Developer Bot hub + product leads) notes. Every change Grok Bot makes to this product (code, env, database, deploys) gets a dated entry here so Claude, Hermes and Codex stay on the same page.
 
+## 2026-10-04 summary
+
+- **Grok:** added the two-owner admin allowlist and inserted the Gmail owner row in production.
+- **Claude:** merged PR #20 (`4c09ca2`) around 6:30 PM CT, adding the full-portfolio review to `NOTES/CLAUDE.md` and `AI_CHANGELOG.md` (notes/docs only).
+- **Hermes:** no 2026-10-04 commit or merged PR identified in this repository.
+- **Juno:** no 2026-10-04 commit or merged PR identified in this repository.
+
+## Catch-up correction — 2026-10-04 (CT)
+
+Claude activity was present; the earlier “no Claude activity” line was incorrect. Each item below has an undo pointer.
+
+- **Claude, 2026-10-04 6:31 PM CT — PR #20, merge `4c09ca24de0c37965000d171bb62187861060369`:** notes: Claude full-portfolio review 2026-10-04 (NOTES/CLAUDE.md, AI_CHANGELOG); added `NOTES/CLAUDE.md` and `AI_CHANGELOG.md` (notes/docs only). Undo: `git revert 4c09ca24de0c37965000d171bb62187861060369`.
+- **2026-10-04 6:31 PM CT — 313aidaroos:** `notes: Claude full-portfolio review 2026-10-04 (NOTES/CLAUDE.md, AI_CHANGELOG) (#20)` landed as `4c09ca24de0c37965000d171bb62187861060369`. Where: commit `4c09ca24de0c37965000d171bb62187861060369`. Undo: `git revert 4c09ca24de0c37965000d171bb62187861060369`.
+
 ## 2026-09-27 (CT) — Developer Bot (hub)
 - Wallet registration: added `geoxis` to `wallet_api_clients` in Supabase project `kzneeksminozmhnqaaun`, with `require_sso=false`.
 - Callback URLs registered: https://spatial-dashboard-xi.vercel.app/auth/apixis/callback; https://spatial-dashboard-xi.vercel.app/api/auth/apixis/callback.
@@ -162,3 +176,18 @@ Read-only backfill of everything that changed after the 2026-09-27 entries above
 - Where: feed client `FeedView.tsx` (tab label) and the shared layout section of the site's feed CSS.
 - Who: Grok Bot (for Awad). No merge, no production deploy.
 - Undo: revert this commit on the PR branch.
+## 2026-10-04 — Owner admin row in prod (Grok)
+- What: inserted ('alaidaroosawad@gmail.com','owner') into prod public.admin_emails on Supabase ncifprfgastofurrlsko via the MCP. Both owner emails are now present. Owner bypass check: Geoxis has no product paywalls to skip, since plans are not on sale (api/redeem.js returns not_on_sale) and nothing reads entitlements. No code change.
+- Who: Grok.
+- Undo: delete from public.admin_emails where email='alaidaroosawad@gmail.com';
+## 2026-10-04 catch-up provenance (CT)
+
+The entries below record the day's observed commits and merged PRs. Existing detailed entries above remain the change descriptions; this section supplies exact provenance and undo pointers.
+
+### Commits
+- `9a477c6` (2026-10-04T18:14:47-05:00, 313aidaroos; alaidaroosawad@gmail.com) — NOTES: gmail owner row added to prod admin_emails (#18). Undo: undo via the merged PR below: git revert 9a477c6.
+- `cd656ff` (2026-10-04T17:47:42-05:00, 313aidaroos; alaidaroosawad@gmail.com) — Owner admin allowlist: both owner emails are Geoxis owner (verified only) (#17). Undo: undo via the merged PR below: git revert cd656ff.
+
+### Merged PRs
+- PR #18, merge `9a477c6`, `grok/notes-admin-row` → `main`, merged 2026-10-04 CT by 313aidaroos: NOTES: gmail owner row added to prod admin_emails. Undo: `git revert 9a477c6`.
+- PR #17, merge `cd656ff`, `grok/owner-admin-allowlist` → `main`, merged 2026-10-04 CT by 313aidaroos: Owner admin allowlist for alaidaroosawad@gmail.com and awad@apixis.dev. Undo: `git revert cd656ff`.
