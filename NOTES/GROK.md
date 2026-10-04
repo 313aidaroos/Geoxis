@@ -174,7 +174,7 @@ The entries below record the day's observed commits and merged PRs. Existing det
 ## 2026-10-04 (CT) — Grok: provenance for unlogged items since 2026-10-02
 - `dd294cc` (18:24 CT, 313aidaroos, **pushed straight to main, no PR**, during the freeze): "notes: 2026-10-04 catch-up", `NOTES/GROK.md` only. Side effect: it deleted this file's intro line and duplicated the "2026-10-04 summary" heading; both repaired in the claude-review-fixes PR. Who: Grok (catch-up job). Undo: `git revert dd294cc`.
 - PR #20 / `4c09ca2` (18:31 CT, branch `claude/great-fermi-6brq7a`): Claude's full-portfolio review, adds `NOTES/CLAUDE.md` + an `AI_CHANGELOG.md` line. Notes only, no code/env/DB. Who: Claude (Claude Code). Undo: `git revert 4c09ca2`.
-- Vercel env `ANTHROPIC_API_KEY` on project `spatial-dashboard` was updated 2026-10-04 12:00 CT by the 313aidaroos account (seen in env metadata; value not read). No note anywhere says who or why. Undo: hub knows the previous key, if needed.
+- Vercel env `ANTHROPIC_API_KEY` on project `spatial-dashboard` was updated 2026-10-04 12:00 CT by the 313aidaroos account (seen in env metadata; value not read). Status: **unattributed, under hub review**. It looks family-wide (Deduxis and PersonalContentBot saw the same change), but who did it and why is unconfirmed. The key itself was not touched. Undo: none from here; the hub decides after its review.
 - Vercel env `ADMIN_EMAILS` created 17:44 CT (production + preview) — already logged under PR #17 above.
 
 ## 2026-10-04 (CT) — Grok: claude-review-fixes (branch `geoxis-lead/claude-review-fixes`, one PR, NOT merged/deployed)
