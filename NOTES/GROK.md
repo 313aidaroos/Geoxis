@@ -197,3 +197,10 @@ The entries below record the day's observed commits and merged PRs. Existing det
 - Not changed: the owner admin allowlist (already both emails since PR #17; `ADMIN_EMAILS` env holds both), Vercel env/protection, Supabase, Wallet, Stripe. No SVGs were removed: Claude added none since 10-02.
 - Who: Grok (Geoxis Lead), at Awad's request via the Developer Bot hub, 2026-10-04 18:43 CT.
 - Undo: close the PR without merging; after a merge, `git revert <squash SHA>`.
+
+## 2026-10-04 (CT) — Grok (Geoxis Lead): AI_MODEL env + merge of PR #21
+- Who: Geoxis Lead (Grok), on the Developer Bot hub's 18:55 CT order relaying Awad (lifts the freeze for PR #21 and PR #7 only).
+- What / where:
+  1. Vercel env `AI_MODEL=claude-sonnet-5` (plain) added ~19:13 CT on project `spatial-dashboard` (team `313aidaroos-projects`), targets production + preview, env id `rKc55dZWD1YNEtvC`. `lib/core.js` `cixyModel()` reads it at runtime. No other env var touched; `ANTHROPIC_API_KEY` not read or changed.
+  2. PR #21 (`geoxis-lead/claude-review-fixes`) squash-merged to `main` after green checks (ci x2, Vercel); the push to main auto-deploys production.
+- Undo: delete env `rKc55dZWD1YNEtvC` in Vercel (code falls back to `claude-sonnet-5`, so also revert if needed); `git revert <PR #21 squash SHA>` (SHA recorded in the PR #7 notes entry).
