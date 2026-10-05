@@ -189,3 +189,34 @@ The entries below record the day's observed commits and merged PRs. Existing det
 - What: merged main (`cca2d9e`) into `geoxis-lead/ixis-footer` via `gh api` (merge commit, no force-push) and re-applied the footer blocks onto main's current `index.html` / `login.html` / `support.html` / `admin.html`. No content or style change to the footer itself. The globe now has both the Codex "Apixis Companies →" link (to `/companies`, 15 cards) and this footer (11 links); Awad may want only one.
 - Who: Grok (Geoxis Lead), hub dispatch 2026-10-04 ~19:00 CT.
 - Undo: revert the PR after merge, or close it.
+
+## 2026-10-04 (CT) — Grok: provenance for unlogged items since 2026-10-02
+- `dd294cc` (18:24 CT, 313aidaroos, **pushed straight to main, no PR**, during the freeze): "notes: 2026-10-04 catch-up", `NOTES/GROK.md` only. Side effect: it deleted this file's intro line and duplicated the "2026-10-04 summary" heading; repaired by `cca2d9e` below. Who: Grok (catch-up job). Undo: `git revert dd294cc`.
+- `cca2d9e` (18:53 CT, 313aidaroos, **pushed straight to main, no PR**, during the freeze): "notes: fix 10-04 catch-up", `NOTES/GROK.md` only; restored the intro line and corrected the Claude line. Who: Grok (catch-up job). Undo: `git revert cca2d9e`.
+- PR #20 / `4c09ca2` (18:31 CT, branch `claude/great-fermi-6brq7a`): Claude's full-portfolio review, adds `NOTES/CLAUDE.md` + an `AI_CHANGELOG.md` line. Notes only, no code/env/DB. Who: Claude (Claude Code). Undo: `git revert 4c09ca2`.
+- Vercel env `ANTHROPIC_API_KEY` on project `spatial-dashboard` was updated 2026-10-04 12:00 CT by the 313aidaroos account (seen in env metadata; value not read). Status: **unattributed, under hub review**. It looks family-wide (Deduxis and PersonalContentBot saw the same change), but who did it and why is unconfirmed. The key itself was not touched. Undo: none from here; the hub decides after its review.
+- Vercel env `ADMIN_EMAILS` created 17:44 CT (production + preview) — already logged under PR #17 above.
+
+## 2026-10-04 (CT) — Grok: claude-review-fixes (branch `geoxis-lead/claude-review-fixes`, one PR, NOT merged/deployed)
+- What / where:
+  1. `spatial-dashboard/api/world/provision.js`: import `../../lib/supabaseServer.js` (was `../lib/…`, which doesn't exist, so the function crashed on load: live GET/POST = 500 FUNCTION_INVOCATION_FAILED). Metadata save now uses the Supabase Auth admin REST endpoint with `envConfig().url/serviceKey` (it used `@supabase/supabase-js`, which isn't a dependency, and wrong field names). Error body no longer echoes `err.message`.
+  2. `spatial-dashboard/src/apixisWorld.js`: sends the session Bearer token (it sent none, so it always got 401); skips the call when signed out.
+  3. `spatial-dashboard/lib/core.js`: Cixy model = `process.env.AI_MODEL || "claude-sonnet-5"` (new `cixyModel()`); it was `claude-sonnet-4-20250514`, retired 2026-06-15 — live POST /api/cixy answered 503 "Cixy is resting".
+  4. `spatial-dashboard/lib/apixis-cixy.js`: the culture line now reads "Your character draws on Arab culture: warm hospitality, generosity, respect and directness." (changed 2026-10-04 ~19:00 CT on the hub's instruction from "Arab and Muslim culture"). Removed (Halaxis-only): the word "Muslim", religious greetings (Salam / As-salamu alaykum), religious phrases (Insha'Allah / alhamdulillah), halal/religious rules (alcohol/pork/gambling/interest), the religious-ruling line and the "faith" wording. Kept honesty and the Ixis/Wallet rules. This Geoxis copy now differs from the canonical `ApixisWallet/docs/CIXY.md` text.
+  5. `spatial-dashboard/test/core.test.mjs`: tests require the Arab culture line and assert that "Muslim"/"Islam", the banned greetings, phrases, rules and rulings are absent. New test for `cixyModel()`.
+  6. `spatial-dashboard/docs/PROVISION_KIT.md`: "200 starter Ixis" → 1,000 (granted once on Apixis.dev). `spatial-dashboard/admin.html`: subtitle names both owner emails (text only, same styling).
+- Not changed: the owner admin allowlist (already both emails since PR #17; `ADMIN_EMAILS` env holds both), Vercel env/protection, Supabase, Wallet, Stripe. No SVGs were removed: Claude added none since 10-02.
+- Who: Grok (Geoxis Lead), at Awad's request via the Developer Bot hub, 2026-10-04 18:43 CT.
+- Undo: close the PR without merging; after a merge, `git revert <squash SHA>`.
+
+## 2026-10-04 (CT) — Grok (Geoxis Lead): AI_MODEL env + merge of PR #21
+- Who: Geoxis Lead (Grok), on the Developer Bot hub's 18:55 CT order relaying Awad (lifts the freeze for PR #21 and PR #7 only).
+- What / where:
+  1. Vercel env `AI_MODEL=claude-sonnet-5` (plain) added ~19:13 CT on project `spatial-dashboard` (team `313aidaroos-projects`), targets production + preview, env id `rKc55dZWD1YNEtvC`. `lib/core.js` `cixyModel()` reads it at runtime. No other env var touched; `ANTHROPIC_API_KEY` not read or changed.
+  2. PR #21 (`geoxis-lead/claude-review-fixes`) squash-merged to `main` after green checks (ci x2, Vercel); the push to main auto-deploys production.
+- Undo: delete env `rKc55dZWD1YNEtvC` in Vercel (code falls back to `claude-sonnet-5`, so also revert if needed); `git revert <PR #21 squash SHA>` (SHA recorded in the PR #7 notes entry).
+
+## 2026-10-04 (CT) — Grok (Geoxis Lead): PR #21 deployed + PR #7 merge
+- Who: Geoxis Lead (Grok), Developer Bot hub order 18:55 CT relaying Awad.
+- PR #21 squash SHA `14b348166bc6e34a797e376edba810032df5e734` (merged 19:14 CT); production deployment `dpl_aTi5evjQuBD6yCVKLqmB78dt5eeU` READY. Prod smoke: GET /api/world/provision 405, signed-out POST 401 (was 500); POST /api/cixy 200 with a normal English greeting (no religious greeting); /, /login, /support, /admin, /companies 200. Undo: `git revert 14b3481`.
+- PR #7 (`geoxis-lead/ixis-footer`): main (`14b3481`) merged into the branch via the GitHub API (merge commit, no force-push); `NOTES/GROK.md` + `AI_CHANGELOG.md` append conflicts resolved by keeping both sides; `admin.html` auto-merged (footer + both-owner subtitle). Then squash-merged to `main` (prod auto-deploy). Undo: `git revert <PR #7 squash SHA>`.

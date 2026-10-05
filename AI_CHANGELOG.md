@@ -54,3 +54,15 @@ Entry format:
 - Why: Awad-approved "Other Ixis companies" footer links (branch `geoxis-lead/ixis-footer`, PR #7)
 - 2026-09-29 update (Grok, Geoxis Lead): removed Nursery Toons and Qahwah World from `spatial-dashboard/src/ixisCompanies.js` (Awad-approved), now 11 sites
 - 2026-10-04 update (Grok, Geoxis Lead): branch brought up to date with main (`cca2d9e`); footer re-applied onto the current pages, unchanged.
+
+## 2026-10-04 (evening) — Grok (Geoxis Lead, claude-review-fixes)
+- Changed: `spatial-dashboard/api/world/provision.js` (import path + REST metadata save; it 500ed on every call), `src/apixisWorld.js` (Bearer token), `lib/core.js` (Cixy model `AI_MODEL` or `claude-sonnet-5`; old one retired), `lib/apixis-cixy.js` + `test/core.test.mjs` (culture line is Arab culture only; "Muslim", religious greetings, phrases, halal rules and rulings removed), `docs/PROVISION_KIT.md` (1,000 starter Ixis), `admin.html` (both owner emails in the subtitle), `NOTES/GROK.md` (entries for every unlogged change since 10-02).
+- Why: Awad's review of Claude's work against his locks: fix only what's broken or breaks a lock. Not merged or deployed.
+
+## 2026-10-04 (night) — Geoxis Lead (Grok)
+- Changed: Vercel env `AI_MODEL=claude-sonnet-5` (plain, production + preview, id `rKc55dZWD1YNEtvC`) on `spatial-dashboard`; PR #21 squash-merged to `main` (prod auto-deploy).
+- Why: Developer Bot hub order (relaying Awad, 18:55 CT) to ship the claude-review fixes. Undo: delete the env var in Vercel; `git revert` the #21 squash commit.
+
+## 2026-10-04 (night, later) — Geoxis Lead (Grok)
+- Changed: PR #21 deployed to production (squash `14b3481`, deploy `dpl_aTi5evjQuBD6yCVKLqmB78dt5eeU`); PR #7 "Other Ixis companies" footer updated with main (append conflicts in notes kept both sides) and squash-merged to `main`.
+- Why: Developer Bot hub order (relaying Awad, 18:55 CT). Undo: `git revert` the PR #7 squash commit; `git revert 14b3481` for #21.
