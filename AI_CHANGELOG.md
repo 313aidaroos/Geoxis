@@ -78,3 +78,7 @@ Entry format:
 ## 2026-10-04 (night, record) — Geoxis Lead (Grok)
 - Changed: notes only — PR #7 squash `d471ddd`, prod deploy `dpl_ELY6dUmxSUWuV5pALhSYa8pMhf93` READY, live footer confirmed.
 - Why: record the merge SHA after the fact (notes PR, no direct push). Undo: `git revert d471ddd`.
+
+## 2026-10-04 (night, record 2) — Geoxis Lead (Grok)
+- Changed: notes only — PR #22 squash `4e9da19`, prod deploy `dpl_FFnaKREhNFJh8HGQMKtTt6A4a9uK` READY; signup setting stays ON (hub decision).
+- Why: record merge SHAs after the fact. Undo: `git revert 4e9da19`.
