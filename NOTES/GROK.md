@@ -263,3 +263,8 @@ The entries below record the day's observed commits and merged PRs. Existing det
 ## 2026-10-04 (CT) — Grok (Geoxis Lead): after-the-fact record for PR #7
 - PR #7 squash SHA `d471ddd050914068d5e7f2e6b25de5d164aa7e07` (merged 19:17 CT); production deployment `dpl_ELY6dUmxSUWuV5pALhSYa8pMhf93` READY. Live check: "Other Ixis companies" present in the HTML of /, /login, /support, /admin. Re-smoke on this deploy: provision GET 405 / POST 401; Cixy "hi" 200; /, /login, /support, /admin, /companies 200.
 - Who: Geoxis Lead (Grok). Undo: `git revert d471ddd` (footer); `git revert 14b3481` (#21); delete Vercel env `rKc55dZWD1YNEtvC` (AI_MODEL).
+
+## 2026-10-04 (CT) — Grok (Geoxis Lead): after-the-fact record for PR #22
+- PR #22 squash SHA `4e9da19a72d9fcdf3b01852bad4d7ca83af7e368` (merged 19:21 CT); production deployment `dpl_FFnaKREhNFJh8HGQMKtTt6A4a9uK` READY. Smoke: /login 200 with the Apixis-only hint; built JS sends `create_user:false` / `should_create_user:false` (no `true` left; no real email submitted); POST /api/cixy "hi" 200; signed-out POST /api/world/provision 401, GET 405.
+- Supabase "Allow new users to sign up" stays ON (hub decision). Main also gained PR #19 (`4c3f8a8`, Socixis feed tab), not by Geoxis Lead.
+- Who: Geoxis Lead (Grok). Undo: `git revert 4e9da19`.
