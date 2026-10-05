@@ -82,3 +82,7 @@ Entry format:
 ## 2026-10-04 (night, record 2) — Geoxis Lead (Grok)
 - Changed: notes only — PR #22 squash `4e9da19`, prod deploy `dpl_FFnaKREhNFJh8HGQMKtTt6A4a9uK` READY; signup setting stays ON (hub decision).
 - Why: record merge SHAs after the fact. Undo: `git revert 4e9da19`.
+
+## 2026-10-04 (night) — Geoxis Lead (Grok), footer full family
+- Changed: `spatial-dashboard/src/ixisCompanies.js` — footer list now the full family (14 sites, Rawixis/companies order, minus Geoxis; adds Pinixis, Launchixis, Ominix). No restyle.
+- Why: Developer Bot hub order 19:19 CT. Undo: `git revert` the squash commit.
