@@ -204,3 +204,10 @@ The entries below record the day's observed commits and merged PRs. Existing det
   1. Vercel env `AI_MODEL=claude-sonnet-5` (plain) added ~19:13 CT on project `spatial-dashboard` (team `313aidaroos-projects`), targets production + preview, env id `rKc55dZWD1YNEtvC`. `lib/core.js` `cixyModel()` reads it at runtime. No other env var touched; `ANTHROPIC_API_KEY` not read or changed.
   2. PR #21 (`geoxis-lead/claude-review-fixes`) squash-merged to `main` after green checks (ci x2, Vercel); the push to main auto-deploys production.
 - Undo: delete env `rKc55dZWD1YNEtvC` in Vercel (code falls back to `claude-sonnet-5`, so also revert if needed); `git revert <PR #21 squash SHA>` (SHA recorded in the PR #7 notes entry).
+
+## 2026-10-04 (CT) — Grok (Developer Bot hub): Cixy persona v2 sync + Ominix link
+- What: Follow-up to lead PR #21 (merged 14b3481; its provision and model fixes untouched): spatial-dashboard/lib/apixis-cixy.js (JS port) replaced with v2 (core text identical to the TS kit); test expects the v2 Arab-culture line. Ominix link in spatial-dashboard/public/companies.html now https://ominix-app.vercel.app (URL string only).
+- Files: spatial-dashboard/lib/apixis-cixy.js spatial-dashboard/public/companies.html spatial-dashboard/test/core.test.mjs 
+- Why: Awad's lock — no religious content in Cixy on any product except Halaxis; she declines only genuinely harmful, deceptive or illegal content, never on religious grounds (9/30). Kit = ApixisWallet `sdk/apixis-cixy.*` v2 (3a22244, PR #50) with two hub edits pending canonical: the religion-derived "clean recommendations" rule (gambling) is replaced by "decline only harmful, deceptive or illegal, never on religious grounds", and the character line reads "draws on Arab culture". Ominix links point to https://ominix-app.vercel.app (checked 200 on 2026-10-04 ~6:55 PM CT).
+- Who: Grok (Developer Bot hub), branch `grok/cixy-v2-20261004`, one squash-merged PR.
+- Undo: `git revert <squash sha of this PR>` (sha recorded in the PR), then redeploy prod.
