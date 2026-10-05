@@ -217,3 +217,9 @@ The entries below record the day's observed commits and merged PRs. Existing det
   1. Vercel env `AI_MODEL=claude-sonnet-5` (plain) added ~19:13 CT on project `spatial-dashboard` (team `313aidaroos-projects`), targets production + preview, env id `rKc55dZWD1YNEtvC`. `lib/core.js` `cixyModel()` reads it at runtime. No other env var touched; `ANTHROPIC_API_KEY` not read or changed.
   2. PR #21 (`geoxis-lead/claude-review-fixes`) squash-merged to `main` after green checks (ci x2, Vercel); the push to main auto-deploys production.
 - Undo: delete env `rKc55dZWD1YNEtvC` in Vercel (code falls back to `claude-sonnet-5`, so also revert if needed); `git revert <PR #21 squash SHA>` (SHA recorded in the PR #7 notes entry).
+
+## 2026-10-04 19:13 (CT) — Grok Bot: Feed PR #19 approved for production by Awad
+- Why: Awad said "make it live" at 7:13 PM CT on Oct 4, 2026, approving the squash-merge of this PR and the production deploy that follows from main.
+- What: squash-merge of PR #19 (feed files + Feed nav entry only); Vercel's Git integration deploys main to production.
+- Who: Grok Bot (for Awad).
+- Undo: `git revert <squash sha of PR #19>` on main and push (the squash sha is on the PR page and in /workspace/feed/STATUS.md), or in Vercel promote the previous production deployment (instant rollback) and then revert.
