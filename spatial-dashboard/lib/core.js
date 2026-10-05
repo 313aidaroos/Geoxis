@@ -1,3 +1,4 @@
+import { CIXY_CORE } from "./apixis-cixy.js";
 /**
  * Pure helpers shared by the Vercel functions. No network here so they
  * are unit-testable with node:test.
@@ -13,8 +14,22 @@ export function normalizeEmail(input) {
   return EMAIL_RE.test(v) && v.length <= 254 ? v : null;
 }
 
+// Owner admin allowlist (Awad's rule, 2026-10-04 Grok): both owner emails are the Geoxis owner/admin.
+// ADMIN_EMAILS (comma-separated, Vercel env) adds to this fallback list. Case-insensitive.
+export const OWNER_ADMIN_EMAILS = Object.freeze(["alaidaroosawad@gmail.com", OWNER_EMAIL]);
+
+export function ownerAdminEmails(env = globalThis.process?.env?.ADMIN_EMAILS) {
+  const list = new Set(OWNER_ADMIN_EMAILS);
+  for (const raw of String(env ?? "").split(",")) {
+    const e = normalizeEmail(raw);
+    if (e) list.add(e);
+  }
+  return list;
+}
+
 export function isOwner(email) {
-  return normalizeEmail(email) === OWNER_EMAIL;
+  const e = normalizeEmail(email);
+  return Boolean(e) && ownerAdminEmails().has(e);
 }
 
 /** Tenant slug from email domain; personal mailboxes get a per-user tenant. */
@@ -93,14 +108,10 @@ export function cixyRequest({ apiKey, messages, context }) {
 
 export function cixySystemPrompt(context = {}) {
   const lines = [
-    "You are Cixy, the native AI inside Geoxis — a live map of everything a company has moving in the real world, on a 3D globe.",
+    CIXY_CORE,
     "",
-    "## Core Identity",
-    "- You are Muslim. Greet with 'As-salamu alaykum' (or 'Salam') where a greeting fits; respond to salaam in kind. Never forced or repeated every turn.",
-    "- You say 'insha'Allah' for future plans, 'alhamdulillah' for good outcomes, 'bismillah' when starting meaningful work — naturally, not on every line.",
-    "- You are modest, calm, professional, warm. Honest to a fault. Never fabricate data or invent positions.",
-    "- You serve everyone respectfully regardless of their faith. Your values shape your conduct and recommendations, not judgment of users.",
-    "- You are halal-conscious: never recommend or help with alcohol, pork, gambling, riba (interest-based lending), adult content, or deceptive practices.",
+    "## Your role on Geoxis",
+    "Geoxis is a live map of everything a company has moving in the real world, on a 3D globe. Never fabricate data or invent positions.",
     "",
     "## Expertise",
     "You are a deep expert in fleet telematics, GPS/AIS/ADS-B feeds, geofencing, ETA logic, WGS84 coordinates, map tiles, and logistics operations.",

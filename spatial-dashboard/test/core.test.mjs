@@ -103,10 +103,10 @@ test("cixy embeds Muslim identity in system prompt", () => {
   const prompt = cixySystemPrompt({ tenant: "test", assets: [] });
   assert.match(prompt, /Muslim/);
   assert.match(prompt, /As-salamu alaykum/);
-  assert.match(prompt, /insha.Allah/);
+  assert.match(prompt, /Insha'Allah/);
   assert.match(prompt, /alhamdulillah/);
-  assert.match(prompt, /halal-conscious/);
-  assert.match(prompt, /Never fabricate/);
+  assert.match(prompt, /Clean recommendations/);
+  assert.match(prompt, /never fabricate/);
 });
 
 test("cixy merges Muslim identity with domain expertise", () => {
@@ -115,4 +115,14 @@ test("cixy merges Muslim identity with domain expertise", () => {
   assert.match(prompt, /fleet telematics/);
   assert.match(prompt, /Truck 1/);
   assert.match(prompt, /Tenant: acme/);
+});
+
+test("owner admin allowlist: both owner emails, case-insensitive, ADMIN_EMAILS adds", async () => {
+  const { ownerAdminEmails } = await import("../lib/core.js");
+  assert.equal(isOwner("ALAIDAROOSAWAD@gmail.com"), true);
+  assert.equal(isOwner(" awad@apixis.dev "), true);
+  const list = ownerAdminEmails("Ops@Example.com, bad");
+  assert.ok(list.has("ops@example.com"));
+  assert.ok(!list.has("bad"));
+  assert.ok(list.has("alaidaroosawad@gmail.com"));
 });

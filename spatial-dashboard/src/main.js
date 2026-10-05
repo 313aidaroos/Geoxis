@@ -10,6 +10,7 @@ import { GeospatialMap } from "./mapController.js";
 import { AssetDataStreamer } from "./streamSimulator.js";
 import { SpatialAIAgent } from "./cixyController.js";
 import { UIController } from "./uiController.js";
+import { provisionIfNeeded, showWelcomeCard } from "./apixisWorld.js";
 
 /* ------------------------------------------------------------------ */
 /*  Event bus                                                          */
@@ -335,6 +336,14 @@ export class B2BSaasEngine {
     });
 
     this.#startStaleSweep();
+
+    // 5. Provision Apixis world agent on first signed-in load
+    setTimeout(async () => {
+      const result = await provisionIfNeeded();
+      if (result.ok) {
+        showWelcomeCard(result);
+      }
+    }, 1000);
 
     if (!this.settings.hasKey("googleMapsKey")) {
       this.ui.toast("Globe is live on the default tiles. Optional: add a Google Maps key for photorealistic 3D.");
