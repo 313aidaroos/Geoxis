@@ -253,3 +253,9 @@ The entries below record the day's observed commits and merged PRs. Existing det
 - Who: Grok (Geoxis Lead), hub dispatch 2026-10-04 ~19:00 CT.
 - Undo: close the PR; after a merge, `git revert <squash SHA>`.
 
+
+## 2026-10-04 (CT) — Grok (Geoxis Lead): merge of PR #22 + Supabase signup decision
+- Who: Geoxis Lead (Grok), Developer Bot hub order 19:19 CT relaying Awad.
+- What: PR #22 (`geoxis-lead/apixis-only-signup`) brought up to date with main via the GitHub API (merge commit, no force-push; `login.html` kept both the Apixis-only hint and the "Other Ixis companies" footer; notes appends kept both sides), then squash-merged to `main` (prod auto-deploy).
+- Supabase "Allow new users to sign up" on `ncifprfgastofurrlsko` **stays ON** (hub decision, 10/4 19:19 CT). Not changed. So `/auth/v1/signup` with the anon key remains open; the app itself no longer creates users from magic links (`create_user: false`) and has no password signup.
+- Undo: `git revert <PR #22 squash SHA>` (recorded in PR #24 / follow-up notes).
