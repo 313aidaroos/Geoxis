@@ -41,6 +41,7 @@
       const res = await fetch("/api/support", { method: "POST", headers: { "Content-Type": "application/json", ...authHeader() }, body: JSON.stringify(payload) });
       const data = await res.json().catch(() => ({}));
       status.textContent = res.ok ? `Ticket ${data.ticket.id} created and routed to ${data.ticket.route_to}.` : (data.error || "Support failed.");
+      if (res.ok) e.target.reset();
     });
   </script>
   <script type="module" src="/src/walletPill.js"></script>
