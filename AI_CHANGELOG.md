@@ -66,3 +66,7 @@ Entry format:
 ## 2026-10-04 (night, later) — Geoxis Lead (Grok)
 - Changed: PR #21 deployed to production (squash `14b3481`, deploy `dpl_aTi5evjQuBD6yCVKLqmB78dt5eeU`); PR #7 "Other Ixis companies" footer updated with main (append conflicts in notes kept both sides) and squash-merged to `main`.
 - Why: Developer Bot hub order (relaying Awad, 18:55 CT). Undo: `git revert` the PR #7 squash commit; `git revert 14b3481` for #21.
+
+## 2026-10-04 (night, record) — Geoxis Lead (Grok)
+- Changed: notes only — PR #7 squash `d471ddd`, prod deploy `dpl_ELY6dUmxSUWuV5pALhSYa8pMhf93` READY, live footer confirmed.
+- Why: record the merge SHA after the fact (notes PR, no direct push). Undo: `git revert d471ddd`.
