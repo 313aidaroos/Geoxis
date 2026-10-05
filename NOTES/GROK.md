@@ -273,3 +273,15 @@ The entries below record the day's observed commits and merged PRs. Existing det
 - What / where: `spatial-dashboard/src/ixisCompanies.js` list only (no markup or style change): 11 → 14 sites, same names/URLs/order as Rawixis.dev's footer (`lib/marketing/ixis-companies.ts`) and this site's `/companies` page, minus Geoxis. Added Pinixis, Launchixis, Ominix (`https://ominix-app.vercel.app`); Rawixis kept (Rawixis's own list omits itself). Order changed to match. Nursery Toons and Qahwah World stay out (Awad 9/29; Rawixis's list doesn't include them either). All 14 URLs returned 200 on 10/4 ~19:24 CT; no URL differs between Rawixis's list and `/companies`. Codex's "Apixis Companies →" link to `/companies` is kept alongside the footer.
 - Who: Geoxis Lead (Grok), Developer Bot hub order 19:19 CT.
 - Undo: `git revert <squash SHA>`.
+
+## 2026-10-04 evening provenance, 6:57 to 9:25 PM (CT)
+
+Recorded by Grok (Developer Bot, notes and status sync at 9:25 PM CT). Every change below already has a detailed entry in this file or in the matching lead note; this section adds the exact commit, PR number, and undo pointer. All commits were pushed under the shared `313aidaroos` GitHub account; the detailed entries say which bot or lead made each one. Text only, no code or settings changed.
+
+- 7:14 PM, PR #21, `14b3481`: Geoxis: claude-review fixes (provision 500, Cixy model, Arab-culture-only Cixy, notes). Undo: `git revert 14b3481` on `main`, then redeploy production.
+- 7:16 PM, PR #23, `03b7d92`: Cixy persona v2 sync (no religious content outside Halaxis) + Ominix link to ominix-app.vercel.app. Undo: `git revert 03b7d92` on `main`, then redeploy production.
+- 7:17 PM, PR #7, `d471ddd`: Footer: "Other Ixis companies" links. Undo: `git revert d471ddd` on `main`, then redeploy production.
+- 7:19 PM, PR #19, `4c3f8a8`: Feed tab: Socixis Social family feed at /feed. Undo: `git revert 4c3f8a8` on `main`, then redeploy production.
+- 7:21 PM, PR #22, `4e9da19`: Apixis ID is the only signup (magic link for existing accounts only). Undo: `git revert 4e9da19` on `main`, then redeploy production.
+- 7:23 PM, PR #24, `7e698e4`: notes: record PR #7 merge SHA + prod deploy (Geoxis Lead). Undo: `git revert 7e698e4` on `main`, then redeploy production.
+- 7:26 PM, PR #25, `c1a7aff`: Footer: full Ixis family list (match Rawixis + /companies). Undo: `git revert c1a7aff` on `main`, then redeploy production.
