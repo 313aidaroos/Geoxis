@@ -48,3 +48,11 @@ Entry format:
 ## 2026-10-04 — Claude (Claude Code, full-portfolio review)
 - Changed: `NOTES/CLAUDE.md` — this repo's slice of the 24-repo review (what is live, what is open, who owns each item, drift found). No code, env, database or deploy changes.
 - Why: Awad asked for every repo to be read twice with a done / to-do / owner status, and for the notes in each repo to be updated. Notes only; Awad approved the merge on 2026-10-04.
+
+## 2026-10-04 (evening) — Grok (Geoxis Lead, claude-review-fixes)
+- Changed: `spatial-dashboard/api/world/provision.js` (import path + REST metadata save; it 500ed on every call), `src/apixisWorld.js` (Bearer token), `lib/core.js` (Cixy model `AI_MODEL` or `claude-sonnet-5`; old one retired), `lib/apixis-cixy.js` + `test/core.test.mjs` (culture line is Arab culture only; "Muslim", religious greetings, phrases, halal rules and rulings removed), `docs/PROVISION_KIT.md` (1,000 starter Ixis), `admin.html` (both owner emails in the subtitle), `NOTES/GROK.md` (entries for every unlogged change since 10-02).
+- Why: Awad's review of Claude's work against his locks: fix only what's broken or breaks a lock. Not merged or deployed.
+
+## 2026-10-04 (night) — Geoxis Lead (Grok)
+- Changed: Vercel env `AI_MODEL=claude-sonnet-5` (plain, production + preview, id `rKc55dZWD1YNEtvC`) on `spatial-dashboard`; PR #21 squash-merged to `main` (prod auto-deploy).
+- Why: Developer Bot hub order (relaying Awad, 18:55 CT) to ship the claude-review fixes. Undo: delete the env var in Vercel; `git revert` the #21 squash commit.
