@@ -192,6 +192,17 @@ The entries below record the day's observed commits and merged PRs. Existing det
 - PR #18, merge `9a477c6`, `grok/notes-admin-row` → `main`, merged 2026-10-04 CT by 313aidaroos: NOTES: gmail owner row added to prod admin_emails. Undo: `git revert 9a477c6`.
 - PR #17, merge `cd656ff`, `grok/owner-admin-allowlist` → `main`, merged 2026-10-04 CT by 313aidaroos: Owner admin allowlist for alaidaroosawad@gmail.com and awad@apixis.dev. Undo: `git revert cd656ff`.
 
+## 2026-09-29 (CT) — "Other Ixis companies" footer (Geoxis Lead / Grok)
+- **What:** Awad-approved footer section linking the other Ixis sites (Geoxis itself left out; Nexxis/Omnixis, Launchixis, PersonalContentBot, AwadBot, COMMAND excluded). Plain text links, `target="_blank" rel="noopener"`, wrap on narrow screens.
+- **Files:** `spatial-dashboard/src/ixisCompanies.js` (new: the single list + renderer into `[data-ixis-companies]`); `index.html` (small block at the bottom of the left sidebar, just above the feed-status bar, so nothing covers the map); `login.html`, `support.html`, `admin.html` (minimal `<footer>` at the bottom of the existing card using the page's existing `border-line` / `text-slate-500` / `text-slate-400 hover:text-emerald-300` styles). Each page loads `/src/ixisCompanies.js`.
+- **Undo:** revert the PR (or delete `src/ixisCompanies.js`, the four `<footer>…data-ixis-companies…</footer>` blocks and the four `<script src="/src/ixisCompanies.js">` tags).
+- **2026-09-29 (CT) update:** removed Nursery Toons and Qahwah World from `src/ixisCompanies.js` (Awad-approved); list is now 11 sites.
+
+## 2026-10-04 (CT) — Grok: PR #7 brought up to date with main
+- What: merged main (`cca2d9e`) into `geoxis-lead/ixis-footer` via `gh api` (merge commit, no force-push) and re-applied the footer blocks onto main's current `index.html` / `login.html` / `support.html` / `admin.html`. No content or style change to the footer itself. The globe now has both the Codex "Apixis Companies →" link (to `/companies`, 15 cards) and this footer (11 links); Awad may want only one.
+- Who: Grok (Geoxis Lead), hub dispatch 2026-10-04 ~19:00 CT.
+- Undo: revert the PR after merge, or close it.
+
 ## 2026-10-04 (CT) — Grok: provenance for unlogged items since 2026-10-02
 - `dd294cc` (18:24 CT, 313aidaroos, **pushed straight to main, no PR**, during the freeze): "notes: 2026-10-04 catch-up", `NOTES/GROK.md` only. Side effect: it deleted this file's intro line and duplicated the "2026-10-04 summary" heading; repaired by `cca2d9e` below. Who: Grok (catch-up job). Undo: `git revert dd294cc`.
 - `cca2d9e` (18:53 CT, 313aidaroos, **pushed straight to main, no PR**, during the freeze): "notes: fix 10-04 catch-up", `NOTES/GROK.md` only; restored the intro line and corrected the Claude line. Who: Grok (catch-up job). Undo: `git revert cca2d9e`.
@@ -223,3 +234,14 @@ The entries below record the day's observed commits and merged PRs. Existing det
 - What: squash-merge of PR #19 (feed files + Feed nav entry only); Vercel's Git integration deploys main to production.
 - Who: Grok Bot (for Awad).
 - Undo: `git revert <squash sha of PR #19>` on main and push (the squash sha is on the PR page and in /workspace/feed/STATUS.md), or in Vercel promote the previous production deployment (instant rollback) and then revert.
+## 2026-10-04 (CT) — Grok (Developer Bot hub): Cixy persona v2 sync + Ominix link
+- What: Follow-up to lead PR #21 (merged 14b3481; its provision and model fixes untouched): spatial-dashboard/lib/apixis-cixy.js (JS port) replaced with v2 (core text identical to the TS kit); test expects the v2 Arab-culture line. Ominix link in spatial-dashboard/public/companies.html now https://ominix-app.vercel.app (URL string only).
+- Files: spatial-dashboard/lib/apixis-cixy.js spatial-dashboard/public/companies.html spatial-dashboard/test/core.test.mjs 
+- Why: Awad's lock — no religious content in Cixy on any product except Halaxis; she declines only genuinely harmful, deceptive or illegal content, never on religious grounds (9/30). Kit = ApixisWallet `sdk/apixis-cixy.*` v2 (3a22244, PR #50) with two hub edits pending canonical: the religion-derived "clean recommendations" rule (gambling) is replaced by "decline only harmful, deceptive or illegal, never on religious grounds", and the character line reads "draws on Arab culture". Ominix links point to https://ominix-app.vercel.app (checked 200 on 2026-10-04 ~6:55 PM CT).
+- Who: Grok (Developer Bot hub), branch `grok/cixy-v2-20261004`, one squash-merged PR.
+- Undo: `git revert <squash sha of this PR>` (sha recorded in the PR), then redeploy prod.
+
+## 2026-10-04 (CT) — Grok (Geoxis Lead): PR #21 deployed + PR #7 merge
+- Who: Geoxis Lead (Grok), Developer Bot hub order 18:55 CT relaying Awad.
+- PR #21 squash SHA `14b348166bc6e34a797e376edba810032df5e734` (merged 19:14 CT); production deployment `dpl_aTi5evjQuBD6yCVKLqmB78dt5eeU` READY. Prod smoke: GET /api/world/provision 405, signed-out POST 401 (was 500); POST /api/cixy 200 with a normal English greeting (no religious greeting); /, /login, /support, /admin, /companies 200. Undo: `git revert 14b3481`.
+- PR #7 (`geoxis-lead/ixis-footer`): main (`14b3481`, then `03b7d92` after the hub merged PR #23) merged into the branch via the GitHub API (merge commit, no force-push); `NOTES/GROK.md` + `AI_CHANGELOG.md` append conflicts resolved by keeping both sides; `admin.html` auto-merged (footer + both-owner subtitle). Then squash-merged to `main` (prod auto-deploy). Undo: `git revert <PR #7 squash SHA>`.
