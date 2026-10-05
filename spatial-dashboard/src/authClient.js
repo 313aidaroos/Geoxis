@@ -36,6 +36,10 @@ export async function config() {
   return res.json();
 }
 
+// 2026-10-04 (Grok, apixis-only-signup): Apixis ID is the only way to create a Geoxis account.
+// Magic links are for existing accounts only (create_user / should_create_user = false).
+export const NO_ACCOUNT_MESSAGE = "No Geoxis account uses this email yet. New here? Use Sign in with Apixis to create your Apixis ID.";
+
 export async function requestMagicLink(email, next = "/") {
   const cfg = await config();
   if (!cfg.supabaseUrl || !cfg.supabaseAnonKey) throw new Error("auth_not_configured");
@@ -46,12 +50,17 @@ export async function requestMagicLink(email, next = "/") {
     headers: { apikey: cfg.supabaseAnonKey, "Content-Type": "application/json" },
     body: JSON.stringify({
       email,
-      create_user: true,
-      should_create_user: true,
+      create_user: false,
+      should_create_user: false,
       email_redirect_to: redirectTo,
     }),
   });
-  if (!res.ok) throw new Error("magic_link_failed");
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    const text = `${body.error_code || ""} ${body.code || ""} ${body.msg || ""} ${body.message || ""} ${body.error_description || ""}`;
+    if (/otp_disabled|signup|not.?allowed|not.?found|user_not_found/i.test(text)) throw new Error(NO_ACCOUNT_MESSAGE);
+    throw new Error("magic_link_failed");
+  }
   return true;
 }
 

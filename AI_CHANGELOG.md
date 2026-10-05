@@ -66,3 +66,11 @@ Entry format:
 ## 2026-10-04 (night, later) — Geoxis Lead (Grok)
 - Changed: PR #21 deployed to production (squash `14b3481`, deploy `dpl_aTi5evjQuBD6yCVKLqmB78dt5eeU`); PR #7 "Other Ixis companies" footer updated with main (append conflicts in notes kept both sides) and squash-merged to `main`.
 - Why: Developer Bot hub order (relaying Awad, 18:55 CT). Undo: `git revert` the PR #7 squash commit; `git revert 14b3481` for #21.
+
+## 2026-10-04 (evening) — Grok (Geoxis Lead, apixis-only-signup)
+- Changed: `spatial-dashboard/src/authClient.js` (magic link `create_user:false`, clear "no account, use Apixis" message), `spatial-dashboard/login.html` (one hint line), `NOTES/GROK.md`.
+- Why: Awad's lock: one Apixis ID; Apixis is the only way to sign up. PR only, not merged.
+
+## 2026-10-04 (night) — Geoxis Lead (Grok), PR #22 merge
+- Changed: PR #22 (Apixis ID is the only signup; magic links `create_user: false`) updated with main and squash-merged. Supabase "Allow new users to sign up" left ON (hub decision).
+- Why: Developer Bot hub order 19:19 CT. Undo: `git revert` the #22 squash commit.

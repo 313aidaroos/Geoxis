@@ -245,3 +245,17 @@ The entries below record the day's observed commits and merged PRs. Existing det
 - Who: Geoxis Lead (Grok), Developer Bot hub order 18:55 CT relaying Awad.
 - PR #21 squash SHA `14b348166bc6e34a797e376edba810032df5e734` (merged 19:14 CT); production deployment `dpl_aTi5evjQuBD6yCVKLqmB78dt5eeU` READY. Prod smoke: GET /api/world/provision 405, signed-out POST 401 (was 500); POST /api/cixy 200 with a normal English greeting (no religious greeting); /, /login, /support, /admin, /companies 200. Undo: `git revert 14b3481`.
 - PR #7 (`geoxis-lead/ixis-footer`): main (`14b3481`, then `03b7d92` after the hub merged PR #23) merged into the branch via the GitHub API (merge commit, no force-push); `NOTES/GROK.md` + `AI_CHANGELOG.md` append conflicts resolved by keeping both sides; `admin.html` auto-merged (footer + both-owner subtitle). Then squash-merged to `main` (prod auto-deploy). Undo: `git revert <PR #7 squash SHA>`.
+
+## 2026-10-04 (CT) — Grok: Apixis ID is the only signup (branch `geoxis-lead/apixis-only-signup`, PR, NOT merged)
+- What: magic-link requests now send `create_user: false` / `should_create_user: false` (they sent `true`, so any email could create a local Supabase account). An unknown email gets "No Geoxis account uses this email yet. New here? Use Sign in with Apixis…". One muted hint line under the Apixis button on `/login` (existing `text-slate-500` style, no redesign). Password stays as sign-in for existing accounts; the code has no password signup (login uses `signInWithPassword`, `/set-password` only updates a signed-in user). New accounts come only from the Apixis ID callback (`lib/apixis-login.js`).
+- Where: `spatial-dashboard/src/authClient.js`, `spatial-dashboard/login.html`.
+- Needs the hub (not done here): Supabase Auth on `ncifprfgastofurrlsko` still allows public signup via `/auth/v1/signup` with the anon key. To fully close it, turn off "Allow new users to sign up" — but first confirm the Apixis callback's admin-API user creation (service role) still works with it off (it should; admin creation bypasses that setting).
+- Who: Grok (Geoxis Lead), hub dispatch 2026-10-04 ~19:00 CT.
+- Undo: close the PR; after a merge, `git revert <squash SHA>`.
+
+
+## 2026-10-04 (CT) — Grok (Geoxis Lead): merge of PR #22 + Supabase signup decision
+- Who: Geoxis Lead (Grok), Developer Bot hub order 19:19 CT relaying Awad.
+- What: PR #22 (`geoxis-lead/apixis-only-signup`) brought up to date with main via the GitHub API (merge commit, no force-push; `login.html` kept both the Apixis-only hint and the "Other Ixis companies" footer; notes appends kept both sides), then squash-merged to `main` (prod auto-deploy).
+- Supabase "Allow new users to sign up" on `ncifprfgastofurrlsko` **stays ON** (hub decision, 10/4 19:19 CT). Not changed. So `/auth/v1/signup` with the anon key remains open; the app itself no longer creates users from magic links (`create_user: false`) and has no password signup.
+- Undo: `git revert <PR #22 squash SHA>` (recorded in PR #24 / follow-up notes).
