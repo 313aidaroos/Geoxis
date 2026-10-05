@@ -52,3 +52,7 @@ Entry format:
 ## 2026-10-04 (evening) — Grok (Geoxis Lead, claude-review-fixes)
 - Changed: `spatial-dashboard/api/world/provision.js` (import path + REST metadata save; it 500ed on every call), `src/apixisWorld.js` (Bearer token), `lib/core.js` (Cixy model `AI_MODEL` or `claude-sonnet-5`; old one retired), `lib/apixis-cixy.js` + `test/core.test.mjs` (culture line is Arab culture only; "Muslim", religious greetings, phrases, halal rules and rulings removed), `docs/PROVISION_KIT.md` (1,000 starter Ixis), `admin.html` (both owner emails in the subtitle), `NOTES/GROK.md` (entries for every unlogged change since 10-02).
 - Why: Awad's review of Claude's work against his locks: fix only what's broken or breaks a lock. Not merged or deployed.
+
+## 2026-10-04 (night) — Geoxis Lead (Grok)
+- Changed: Vercel env `AI_MODEL=claude-sonnet-5` (plain, production + preview, id `rKc55dZWD1YNEtvC`) on `spatial-dashboard`; PR #21 squash-merged to `main` (prod auto-deploy).
+- Why: Developer Bot hub order (relaying Awad, 18:55 CT) to ship the claude-review fixes. Undo: delete the env var in Vercel; `git revert` the #21 squash commit.
