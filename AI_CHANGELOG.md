@@ -70,3 +70,7 @@ Entry format:
 ## 2026-10-04 (evening) — Grok (Geoxis Lead, apixis-only-signup)
 - Changed: `spatial-dashboard/src/authClient.js` (magic link `create_user:false`, clear "no account, use Apixis" message), `spatial-dashboard/login.html` (one hint line), `NOTES/GROK.md`.
 - Why: Awad's lock: one Apixis ID; Apixis is the only way to sign up. PR only, not merged.
+
+## 2026-10-04 (night) — Geoxis Lead (Grok), PR #22 merge
+- Changed: PR #22 (Apixis ID is the only signup; magic links `create_user: false`) updated with main and squash-merged. Supabase "Allow new users to sign up" left ON (hub decision).
+- Why: Developer Bot hub order 19:19 CT. Undo: `git revert` the #22 squash commit.
