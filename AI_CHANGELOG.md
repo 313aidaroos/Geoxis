@@ -48,3 +48,7 @@ Entry format:
 ## 2026-10-04 — Claude (Claude Code, full-portfolio review)
 - Changed: `NOTES/CLAUDE.md` — this repo's slice of the 24-repo review (what is live, what is open, who owns each item, drift found). No code, env, database or deploy changes.
 - Why: Awad asked for every repo to be read twice with a done / to-do / owner status, and for the notes in each repo to be updated. Notes only; Awad approved the merge on 2026-10-04.
+
+## 2026-10-04 (evening) — Grok (Geoxis Lead, apixis-only-signup)
+- Changed: `spatial-dashboard/src/authClient.js` (magic link `create_user:false`, clear "no account, use Apixis" message), `spatial-dashboard/login.html` (one hint line), `NOTES/GROK.md`.
+- Why: Awad's lock: one Apixis ID; Apixis is the only way to sign up. PR only, not merged.

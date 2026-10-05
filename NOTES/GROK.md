@@ -178,3 +178,11 @@ The entries below record the day's observed commits and merged PRs. Existing det
 ### Merged PRs
 - PR #18, merge `9a477c6`, `grok/notes-admin-row` → `main`, merged 2026-10-04 CT by 313aidaroos: NOTES: gmail owner row added to prod admin_emails. Undo: `git revert 9a477c6`.
 - PR #17, merge `cd656ff`, `grok/owner-admin-allowlist` → `main`, merged 2026-10-04 CT by 313aidaroos: Owner admin allowlist for alaidaroosawad@gmail.com and awad@apixis.dev. Undo: `git revert cd656ff`.
+
+## 2026-10-04 (CT) — Grok: Apixis ID is the only signup (branch `geoxis-lead/apixis-only-signup`, PR, NOT merged)
+- What: magic-link requests now send `create_user: false` / `should_create_user: false` (they sent `true`, so any email could create a local Supabase account). An unknown email gets "No Geoxis account uses this email yet. New here? Use Sign in with Apixis…". One muted hint line under the Apixis button on `/login` (existing `text-slate-500` style, no redesign). Password stays as sign-in for existing accounts; the code has no password signup (login uses `signInWithPassword`, `/set-password` only updates a signed-in user). New accounts come only from the Apixis ID callback (`lib/apixis-login.js`).
+- Where: `spatial-dashboard/src/authClient.js`, `spatial-dashboard/login.html`.
+- Needs the hub (not done here): Supabase Auth on `ncifprfgastofurrlsko` still allows public signup via `/auth/v1/signup` with the anon key. To fully close it, turn off "Allow new users to sign up" — but first confirm the Apixis callback's admin-API user creation (service role) still works with it off (it should; admin creation bypasses that setting).
+- Who: Grok (Geoxis Lead), hub dispatch 2026-10-04 ~19:00 CT.
+- Undo: close the PR; after a merge, `git revert <squash SHA>`.
+

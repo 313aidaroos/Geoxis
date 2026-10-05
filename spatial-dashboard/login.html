@@ -36,6 +36,8 @@
 
     <!-- Sign in with Apixis (2026-09-27, Grok Bot): one Apixis ID + your Wallet balance across the family -->
     <a id="apixisSignIn" href="/auth/apixis/start" class="mt-4 flex w-full h-11 items-center justify-center rounded-md border border-emerald-500/40 bg-emerald-500/10 text-emerald-300 font-medium hover:bg-emerald-500/20">Sign in with Apixis</a>
+    <!-- 2026-10-04 (Grok, apixis-only-signup): new accounts are created with Apixis ID only; email link / password are for existing accounts. -->
+    <p class="mt-2 text-[12px] text-slate-500">New to Geoxis? Create your account with Sign in with Apixis. Email link and password are for existing accounts.</p>
   </main>
   <script type="module">
     import { consumeAuthHash, requestMagicLink, clearSession } from "/src/authClient.js";
