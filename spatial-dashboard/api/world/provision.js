@@ -1,5 +1,7 @@
 // Automatic Apixis world agent provision endpoint (Geoxis, 2026-09-30)
-import { authContext, sendJson, envConfig } from "../lib/supabaseServer.js";
+// Fix 2026-10-04 (Grok, claude-review-fixes): import path was ../lib (module crashed on load -> 500 on every call),
+// cfg field names were wrong, and @supabase/supabase-js is not a dependency. Now ../../lib + Supabase Auth admin REST.
+import { authContext, sendJson, envConfig } from "../../lib/supabaseServer.js";
 
 function meta(user) {
   return (user?.app_metadata ?? {});
@@ -135,20 +137,22 @@ export default async function handler(req, res) {
       });
     }
 
-    // Save to metadata
-    const { createClient } = await import("@supabase/supabase-js");
-    const supabaseAdmin = createClient(cfg.supabaseUrl, cfg.supabaseServiceRoleKey);
+    // Save to metadata (Supabase Auth admin REST, service role; same pattern as lib/apixis-login.js)
     const next = {
       ...m,
       apixis_world_agent_at: new Date().toISOString(),
       apixis_world_agent_id: provResult.agent?.id ?? null,
       apixis_world_agent_name: provResult.agent?.name ?? null,
     };
-    const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(user.id, {
-      app_metadata: next,
-    });
-    if (updateError) {
-      console.error("[world/provision] metadata save failed:", updateError);
+    if (cfg.url && cfg.serviceKey) {
+      const saved = await fetch(`${cfg.url}/auth/v1/admin/users/${encodeURIComponent(user.id)}`, {
+        method: "PUT",
+        headers: { apikey: cfg.serviceKey, Authorization: `Bearer ${cfg.serviceKey}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ app_metadata: next }),
+      }).catch((e) => ({ ok: false, status: 0, error: e }));
+      if (!saved.ok) console.error("[world/provision] metadata save failed:", saved.status);
+    } else {
+      console.error("[world/provision] metadata save skipped: supabase_not_configured");
     }
 
     return sendJson(res, 200, {
@@ -163,7 +167,6 @@ export default async function handler(req, res) {
     return sendJson(res, 500, {
       ok: false,
       error: "provision_failed",
-      message: err.message,
     });
   }
 }

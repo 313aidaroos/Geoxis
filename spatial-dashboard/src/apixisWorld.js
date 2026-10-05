@@ -1,11 +1,15 @@
 // Apixis world agent client (Geoxis, 2026-09-30)
 // Calls server provision endpoint and shows welcome card
+// Fix 2026-10-04 (Grok): send the session Bearer token; without it the endpoint always answered 401.
+import { getToken } from "./authClient.js";
 
 export async function provisionIfNeeded() {
+  const token = getToken();
+  if (!token) return { ok: false, needsSignIn: true };
   try {
     const response = await fetch("/api/world/provision", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
     });
 
     if (response.status === 401) {
