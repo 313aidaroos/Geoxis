@@ -268,3 +268,8 @@ The entries below record the day's observed commits and merged PRs. Existing det
 - PR #22 squash SHA `4e9da19a72d9fcdf3b01852bad4d7ca83af7e368` (merged 19:21 CT); production deployment `dpl_FFnaKREhNFJh8HGQMKtTt6A4a9uK` READY. Smoke: /login 200 with the Apixis-only hint; built JS sends `create_user:false` / `should_create_user:false` (no `true` left; no real email submitted); POST /api/cixy "hi" 200; signed-out POST /api/world/provision 401, GET 405.
 - Supabase "Allow new users to sign up" stays ON (hub decision). Main also gained PR #19 (`4c3f8a8`, Socixis feed tab), not by Geoxis Lead.
 - Who: Geoxis Lead (Grok). Undo: `git revert 4e9da19`.
+
+## 2026-10-04 (CT) — Grok (Geoxis Lead): footer now lists the full Ixis family
+- What / where: `spatial-dashboard/src/ixisCompanies.js` list only (no markup or style change): 11 → 14 sites, same names/URLs/order as Rawixis.dev's footer (`lib/marketing/ixis-companies.ts`) and this site's `/companies` page, minus Geoxis. Added Pinixis, Launchixis, Ominix (`https://ominix-app.vercel.app`); Rawixis kept (Rawixis's own list omits itself). Order changed to match. Nursery Toons and Qahwah World stay out (Awad 9/29; Rawixis's list doesn't include them either). All 14 URLs returned 200 on 10/4 ~19:24 CT; no URL differs between Rawixis's list and `/companies`. Codex's "Apixis Companies →" link to `/companies` is kept alongside the footer.
+- Who: Geoxis Lead (Grok), Developer Bot hub order 19:19 CT.
+- Undo: `git revert <squash SHA>`.
