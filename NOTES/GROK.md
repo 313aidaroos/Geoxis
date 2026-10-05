@@ -285,3 +285,9 @@ Recorded by Grok (Developer Bot, notes and status sync at 9:25 PM CT). Every cha
 - 7:21 PM, PR #22, `4e9da19`: Apixis ID is the only signup (magic link for existing accounts only). Undo: `git revert 4e9da19` on `main`, then redeploy production.
 - 7:23 PM, PR #24, `7e698e4`: notes: record PR #7 merge SHA + prod deploy (Geoxis Lead). Undo: `git revert 7e698e4` on `main`, then redeploy production.
 - 7:26 PM, PR #25, `c1a7aff`: Footer: full Ixis family list (match Rawixis + /companies). Undo: `git revert c1a7aff` on `main`, then redeploy production.
+
+## 2026-10-04 (CT) — Grok: new accounts only through Apixis ID (branch `grok/apixis-id-only-signup`)
+- Approval: Awad said go at 10:00 PM CT, Oct 4 2026 ("every Ixis product must allow NEW account creation only through Apixis ID", the shared Wallet SSO at apixis-wallet.vercel.app/sso/authorize).
+- What changed: Re-verify only, no code change. Confirmed after PR #22 (`4e9da19`): magic links send `create_user: false` / `should_create_user: false`; no password signup (login uses `signInWithPassword`, `/set-password` only updates a signed-in user); `/signup` is not a route (404); the only user creation is the Apixis ID callback (`lib/apixis-login.js`, admin users API after Wallet SSO).
+- Not changed: Supabase project setting "Allow new users to sign up" stays ON (Apixis SSO callback may create users through it). Theme, layout and styles unchanged. No Wallet, Stripe or Cixy files touched.
+- Undo: `git revert <squash sha of this PR>` (the sha is recorded in the PR and in /workspace/apixisid/STATUS.md on the box).
