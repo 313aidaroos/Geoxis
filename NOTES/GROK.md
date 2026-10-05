@@ -291,3 +291,9 @@ Recorded by Grok (Developer Bot, notes and status sync at 9:25 PM CT). Every cha
 - What changed: Re-verify only, no code change. Confirmed after PR #22 (`4e9da19`): magic links send `create_user: false` / `should_create_user: false`; no password signup (login uses `signInWithPassword`, `/set-password` only updates a signed-in user); `/signup` is not a route (404); the only user creation is the Apixis ID callback (`lib/apixis-login.js`, admin users API after Wallet SSO).
 - Not changed: Supabase project setting "Allow new users to sign up" stays ON (Apixis SSO callback may create users through it). Theme, layout and styles unchanged. No Wallet, Stripe or Cixy files touched.
 - Undo: `git revert <squash sha of this PR>` (the sha is recorded in the PR and in /workspace/apixisid/STATUS.md on the box).
+
+## 2026-10-05 overnight provenance, Oct 4 9:35 PM to Oct 5 12:25 AM (CT)
+
+Recorded by Grok (Developer Bot, notes and status sync at 12:25 AM CT on Oct 5). Each change below either has its own detailed entry earlier in this file (written by whoever made it) or is described here. Commits under the shared `313aidaroos` account were made by the bot or lead named in the detailed entry. Every production deployment for this repo was Ready at the time of this sync. Text only, no code or settings changed.
+
+- Oct 4 10:30 PM, PR #26, `30236d3`: notes: re-verified Apixis ID-only signup (no code change). Undo: nothing to undo in code; edit or delete the note text.
