@@ -163,6 +163,19 @@ Read-only backfill of everything that changed after the 2026-09-27 entries above
 - Who: Grok.
 - Undo: `git revert <squash SHA>` and delete `ADMIN_EMAILS` in Vercel → spatial-dashboard → Settings → Environment Variables.
 
+## 2026-10-04 (CT) — Grok Bot: Feed tab on Geoxis (PR open, NOT merged)
+- Why: Awad asked for the Socixis Social family feed as a Feed tab on every Ixis site. Awad put feed changes on hold, so this PR is for preview review only; do not merge until Awad says so.
+- What: new public `/feed` page in Geoxis's own shell (same header, footer, fonts, colors and buttons). For You is the unfiltered mixed feed from every Apixis company with source-site badges and AI labels; Following, Search · Trending and You tabs; video/photo/text posts, like, comment, follow, save, share, report, tips and boosts in Ixis. Signed-out visitors can browse; the 4th tab says "You" and shows a sign-in card (Apixis ID). Text-only posts use the site's body font, wrap long words and size to their content; media posts keep the full-height layout; feed modals sit above everything.
+- Where: `spatial-dashboard/public/feed.html` (static page with the globe's own top-bar look: Geoxis brand, Login/Support/Admin, family links; Tailwind config and Special Elite font copied from index.html; "◎" glyph instead of the inline globe SVG), `spatial-dashboard/public/feed.css`, `spatial-dashboard/public/js/feed/feed-app.js` (esbuild bundle of `spatial-dashboard/feed-client/`), `spatial-dashboard/api/feed-session.js` (Geoxis keeps its Supabase token in localStorage, so the page sends it as a Bearer header via the new optional `sessionHeaders` client option), "Feed →" link in `index.html` family nav and in `public/companies.html`.
+- Backend: https://www.apixis.dev/api/feed. `/api/feed-session` calls POST /api/feed/session server-side with the existing `APIXIS_WORLD_KEY` + X-Apixis-Client/Sub/Email and returns the short-lived fdt_ token. No new env vars, no DB change, no SVGs.
+- Who: Grok Bot (for Awad).
+- Undo: close this PR, or `git revert <squash sha>` if it is ever merged.
+
+## 2026-10-04 19:00 (CT) — Grok Bot: Feed phone tab fit (same PR, still NOT merged)
+- What: at 375px the 4th "You" tab was pushed off-screen by "Search · Trending". Under 560px the tab now reads "Search", tabs are tighter, and if a wide site font still can't fit the tabs and "+ Post" on one row, Post drops to its own row instead of covering "You". Desktop is unchanged; the site's colors, fonts and buttons are untouched; no SVGs.
+- Where: feed client `FeedView.tsx` (tab label) and the shared layout section of the site's feed CSS.
+- Who: Grok Bot (for Awad). No merge, no production deploy.
+- Undo: revert this commit on the PR branch.
 ## 2026-10-04 — Owner admin row in prod (Grok)
 - What: inserted ('alaidaroosawad@gmail.com','owner') into prod public.admin_emails on Supabase ncifprfgastofurrlsko via the MCP. Both owner emails are now present. Owner bypass check: Geoxis has no product paywalls to skip, since plans are not on sale (api/redeem.js returns not_on_sale) and nothing reads entitlements. No code change.
 - Who: Grok.
@@ -216,6 +229,11 @@ The entries below record the day's observed commits and merged PRs. Existing det
   2. PR #21 (`geoxis-lead/claude-review-fixes`) squash-merged to `main` after green checks (ci x2, Vercel); the push to main auto-deploys production.
 - Undo: delete env `rKc55dZWD1YNEtvC` in Vercel (code falls back to `claude-sonnet-5`, so also revert if needed); `git revert <PR #21 squash SHA>` (SHA recorded in the PR #7 notes entry).
 
+## 2026-10-04 19:13 (CT) — Grok Bot: Feed PR #19 approved for production by Awad
+- Why: Awad said "make it live" at 7:13 PM CT on Oct 4, 2026, approving the squash-merge of this PR and the production deploy that follows from main.
+- What: squash-merge of PR #19 (feed files + Feed nav entry only); Vercel's Git integration deploys main to production.
+- Who: Grok Bot (for Awad).
+- Undo: `git revert <squash sha of PR #19>` on main and push (the squash sha is on the PR page and in /workspace/feed/STATUS.md), or in Vercel promote the previous production deployment (instant rollback) and then revert.
 ## 2026-10-04 (CT) — Grok (Developer Bot hub): Cixy persona v2 sync + Ominix link
 - What: Follow-up to lead PR #21 (merged 14b3481; its provision and model fixes untouched): spatial-dashboard/lib/apixis-cixy.js (JS port) replaced with v2 (core text identical to the TS kit); test expects the v2 Arab-culture line. Ominix link in spatial-dashboard/public/companies.html now https://ominix-app.vercel.app (URL string only).
 - Files: spatial-dashboard/lib/apixis-cixy.js spatial-dashboard/public/companies.html spatial-dashboard/test/core.test.mjs 
