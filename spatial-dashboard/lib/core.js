@@ -85,6 +85,12 @@ export function bearerToken(req) {
   return m ? m[1] : null;
 }
 
+/** Cixy model: AI_MODEL env (Vercel) or the default below. */
+export function cixyModel(env = globalThis.process?.env) {
+  const m = String(env?.AI_MODEL ?? "").trim();
+  return m || "claude-sonnet-5";
+}
+
 /** Build the Anthropic request for Cixy or a 503 descriptor when the key is missing. */
 export function cixyRequest({ apiKey, messages, context }) {
   if (!apiKey) return { status: 503, error: "cixy_unavailable" };
@@ -98,7 +104,8 @@ export function cixyRequest({ apiKey, messages, context }) {
   return {
     status: 200,
     body: {
-      model: "claude-sonnet-4-20250514",
+      // 2026-10-04 (Grok): claude-sonnet-4-20250514 was retired 2026-06-15, so Cixy always fell back to "resting".
+      model: cixyModel(),
       max_tokens: 700,
       system: cixySystemPrompt(context),
       messages: clean,

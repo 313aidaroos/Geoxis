@@ -38,6 +38,11 @@
     <a id="apixisSignIn" href="/auth/apixis/start" class="mt-4 flex w-full h-11 items-center justify-center rounded-md border border-emerald-500/40 bg-emerald-500/10 text-emerald-300 font-medium hover:bg-emerald-500/20">Sign in with Apixis</a>
     <!-- 2026-10-04 (Grok, apixis-only-signup): new accounts are created with Apixis ID only; email link / password are for existing accounts. -->
     <p class="mt-2 text-[12px] text-slate-500">New to Geoxis? Create your account with Sign in with Apixis. Email link and password are for existing accounts.</p>
+    <!-- Other Ixis companies (2026-09-29, Geoxis Lead / Grok): links rendered from src/ixisCompanies.js -->
+    <footer class="mt-6 pt-4 border-t border-line">
+      <div class="text-[12px] text-slate-500 mb-1">Other Ixis companies</div>
+      <nav data-ixis-companies aria-label="Other Ixis companies" class="flex flex-wrap gap-x-3 gap-y-0 text-[12px]"></nav>
+    </footer>
   </main>
   <script type="module">
     import { consumeAuthHash, requestMagicLink, clearSession } from "/src/authClient.js";
@@ -116,5 +121,6 @@
     // Consume any hash-based token on page load (magic link, or Sign in with Apixis → go straight to next)
     if (consumeAuthHash()) location.replace(safeNext);
   </script>
+  <script type="module" src="/src/ixisCompanies.js"></script>
 </body>
 </html>

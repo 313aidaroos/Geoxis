@@ -14,12 +14,17 @@
     <div class="mt-5 flex items-end justify-between gap-4">
       <div>
         <h1 class="text-2xl font-semibold">Support queue</h1>
-        <p class="mt-1 text-sm text-slate-400">Owner/admin only. awad@apixis.dev is the owner account.</p>
+        <p class="mt-1 text-sm text-slate-400">Owner/admin only. awad@apixis.dev and alaidaroosawad@gmail.com are the owner accounts.</p>
       </div>
       <a href="/login.html" class="rounded-md border border-line px-3 py-2 text-sm">Login</a>
     </div>
     <p id="status" class="mt-5 text-sm text-slate-400">Checking session…</p>
     <div id="tickets" class="mt-5 grid gap-3"></div>
+    <!-- Other Ixis companies (2026-09-29, Geoxis Lead / Grok): links rendered from src/ixisCompanies.js -->
+    <footer class="mt-6 pt-4 border-t border-line">
+      <div class="text-[12px] text-slate-500 mb-1">Other Ixis companies</div>
+      <nav data-ixis-companies aria-label="Other Ixis companies" class="flex flex-wrap gap-x-3 gap-y-0 text-[12px]"></nav>
+    </footer>
   </main>
   <script type="module">
     import { authHeader, loadMe } from "/src/authClient.js";
@@ -42,5 +47,6 @@
     function escapeHtml(s) { return String(s ?? "").replace(/[&<>"]/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c])); }
   </script>
   <script type="module" src="/src/walletPill.js"></script>
+  <script type="module" src="/src/ixisCompanies.js"></script>
 </body>
 </html>

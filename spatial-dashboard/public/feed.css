@@ -1,0 +1,134 @@
+/* Geoxis feed: same font rule as src/styles.css, then the shared feed layout mapped onto the Geoxis palette. */
+:root { color-scheme: dark; }
+body, * { font-family: 'Special Elite', monospace !important; }
+.fx-root {
+  --fx-ink: #e2e8f0;
+  --fx-accent: #10b981;
+  --fx-on-accent: #020617;
+  --fx-link: #6ee7b7;
+  --fx-media-bg: #1d2130;
+  --fx-scrim: rgba(15, 17, 23, 0.8);
+  --fx-avatar-radius: 50%;
+  --fx-media-radius: 8px;
+  --fx-gap: 14px;
+  --fx-offset: 230px;
+  --fx-offset-mobile: 220px;
+}
+.fx-root .gx-feed-tabs { gap: 4px; border-bottom: 1px solid #2c3245; padding-bottom: 6px; flex: 1 1 auto; }
+.fx-root .gx-feed-tab { border: 0; background: transparent; color: #94a3b8; padding: 7px 10px; border-radius: 6px; font-size: 13px; cursor: pointer; }
+.fx-root .gx-feed-tab:hover { background: #1d2130; color: #f1f5f9; }
+.fx-root .gx-feed-tab-on { color: #6ee7b7; box-shadow: inset 0 -2px #34d399; }
+.fx-root .fx-post-head { border-bottom: 1px solid #2c3245; padding-bottom: 12px; }
+.fx-root .fx-on { color: #6ee7b7 !important; border-color: rgba(52, 211, 153, 0.5) !important; }
+.fx-root .fx-sheet { max-width: 560px; }
+/* Feed layout (shared). Uses ONLY the --fx-* aliases defined above, which point at this site's own
+   CSS variables. No colors or fonts of its own. */
+.fx-root { display: grid; gap: var(--fx-gap, 14px); color: var(--fx-ink); font-family: var(--fx-font, inherit); }
+.fx-root, .fx-root > *, .fx-layout > *, .fx-stream > * { min-width: 0; max-width: 100%; box-sizing: border-box; }
+.fx-topbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.fx-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin: 0; padding: 0; }
+.fx-tabs button { white-space: nowrap; }
+.fx-tab-short { display: none; }
+.fx-layout { display: grid; grid-template-columns: minmax(0, 620px) minmax(240px, 300px); gap: var(--fx-gap, 14px); align-items: start; }
+.fx-layout-single { grid-template-columns: minmax(0, 680px); }
+.fx-main { min-width: 0; display: grid; gap: var(--fx-gap, 14px); }
+.fx-aside { display: grid; gap: var(--fx-gap, 14px); position: sticky; top: var(--fx-sticky-top, 16px); }
+.fx-stream { display: grid; gap: var(--fx-gap, 14px); max-height: calc(100dvh - var(--fx-offset, 200px)); min-height: 320px; overflow-y: auto; scroll-snap-type: y mandatory; overscroll-behavior: contain; padding: 2px 6px 6px 2px; scrollbar-width: thin; align-content: start; }
+.fx-stream-empty { min-height: 0; }
+.fx-post { scroll-snap-align: start; display: flex; flex-direction: column; gap: 10px; min-height: min(calc(100dvh - var(--fx-offset, 200px) - 8px), 760px); margin: 0; }
+/* Text-only posts size to their text (no giant empty card); video/photo posts keep the full-height layout. */
+.fx-post.fx-post-text { min-height: 0; }
+.fx-post-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.fx-root .fx-author { display: flex; align-items: center; gap: 10px; background: none !important; border: 0 !important; padding: 0 !important; margin: 0; color: inherit !important; text-align: left; cursor: pointer; box-shadow: none !important; transform: none !important; min-width: 0; flex: 1 1 auto; font: inherit; }
+.fx-author-text { display: grid; line-height: 1.25; min-width: 0; }
+.fx-author-text strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fx-author-text small { font-size: 0.82em; }
+.fx-badges { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.fx-badge { font-size: 0.78em; line-height: 1.2; white-space: nowrap; }
+.fx-avatar { display: inline-grid; place-items: center; flex: none; width: 36px; height: 36px; border-radius: var(--fx-avatar-radius, 50%); background: var(--fx-accent); color: var(--fx-on-accent); font-weight: 700; object-fit: cover; overflow: hidden; }
+.fx-avatar-sm { width: 28px; height: 28px; font-size: 0.85em; }
+.fx-avatar-lg { width: 64px; height: 64px; font-size: 1.6em; }
+.fx-media { position: relative; flex: 1 1 auto; min-height: 240px; display: grid; place-items: center; overflow: hidden; border-radius: var(--fx-media-radius, 0); background: var(--fx-media-bg); }
+.fx-media video, .fx-media img { width: 100%; height: 100%; max-height: calc(100dvh - var(--fx-offset, 200px) - 170px); object-fit: contain; display: block; }
+.fx-sound { position: absolute; right: 10px; bottom: 10px; }
+.fx-root .fx-text-body { flex: 0 1 auto; display: block; padding: 8px 4px; font-family: var(--fx-body-font, inherit); font-size: var(--fx-text-post-size, 1.1em); font-weight: inherit; line-height: 1.55; text-transform: none; letter-spacing: normal; min-width: 0; white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; }
+.fx-caption-wrap { padding: 0 2px; }
+.fx-caption { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.fx-root .fx-link { background: none !important; border: 0 !important; box-shadow: none !important; padding: 0 !important; margin: 0; color: var(--fx-link) !important; font-weight: inherit !important; border-radius: 0 !important; transform: none !important; font: inherit; cursor: pointer; text-decoration: none; white-space: normal; overflow-wrap: anywhere; text-align: left; max-width: 100%; }
+.fx-link:hover { text-decoration: underline; }
+.fx-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; }
+.fx-sm { padding: 6px 10px !important; font-size: 0.85em !important; line-height: 1.2 !important; min-height: 0 !important; }
+.fx-on { color: var(--fx-accent) !important; border-color: var(--fx-accent) !important; }
+.fx-held, .fx-inline-msg { margin: 0; padding: 8px 10px; font-size: 0.9em; }
+.fx-state { display: grid; gap: 10px; place-items: center; text-align: center; min-height: 160px; align-content: center; }
+.fx-loading { text-align: center; margin: 6px 0; }
+.fx-end { height: 1px; }
+.fx-toast { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); z-index: 2147483001; margin: 0; padding: 10px 14px; max-width: 90vw; }
+.fx-subhead { display: flex; align-items: center; gap: 12px; }
+.fx-subhead h2 { margin: 0; }
+.fx-profile-card { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+.fx-profile-text { flex: 1 1 220px; display: grid; gap: 4px; }
+.fx-profile-text h2, .fx-profile-text p { margin: 0; }
+.fx-counts { display: flex; gap: 14px; flex-wrap: wrap; }
+.fx-tag-list { list-style: none; margin: 0; padding: 0; display: grid; }
+.fx-tag-list li { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.fx-search { display: grid; gap: var(--fx-gap, 14px); }
+.fx-search-trending { display: none; }
+.fx-root .fx-person { display: flex; align-items: center; gap: 10px; width: 100%; background: none !important; border-left: 0 !important; border-right: 0 !important; border-top: 0 !important; border-radius: 0 !important; text-align: left; color: inherit !important; cursor: pointer; font: inherit; box-shadow: none !important; padding-left: 0 !important; padding-right: 0 !important; }
+.fx-field { display: grid; gap: 6px; margin: 0 0 10px; }
+.fx-field input, .fx-field select, .fx-field textarea { width: 100%; box-sizing: border-box; }
+.fx-signin { display: grid; gap: 10px; justify-items: start; }
+.fx-signin p { margin: 0; }
+.fx-me, .fx-settings, .fx-profile { display: grid; gap: var(--fx-gap, 14px); }
+.fx-toggle { display: flex; gap: 8px; align-items: center; margin: 8px 0; }
+.fx-composer, .fx-report, .fx-boost, .fx-tip { display: grid; gap: 10px; }
+.fx-composer p, .fx-tip p, .fx-boost p { margin: 0; }
+.fx-preview { max-width: 100%; max-height: 280px; border-radius: var(--fx-media-radius, 0); }
+.fx-cross { border: 0; padding: 0; margin: 0; display: flex; gap: 14px; flex-wrap: wrap; }
+.fx-cross legend { width: 100%; margin-bottom: 4px; }
+.fx-presets { display: flex; gap: 10px; flex-wrap: wrap; }
+.fx-comments { display: grid; gap: 8px; }
+.fx-comment-form { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.fx-comment-form input { flex: 1 1 200px; min-width: 0; }
+.fx-comment-form p { width: 100%; margin: 0; }
+.fx-comment { display: block; }
+.fx-comment-line { display: flex; gap: 10px; align-items: flex-start; }
+.fx-comment-line p { margin: 0 0 3px; }
+.fx-comment-body { white-space: pre-wrap; overflow-wrap: anywhere; }
+.fx-comment-actions { display: flex; gap: 12px; font-size: 0.85em; }
+.fx-replies { margin-left: 38px; display: grid; gap: 4px; }
+/* Modals sit above every floating element; anything marked data-floating-widget hides while a feed modal is open. */
+.fx-sheet-wrap { position: fixed; inset: 0; z-index: 2147483000; isolation: isolate; display: grid; place-items: center; padding: 16px; }
+html[data-fx-modal="open"] [data-floating-widget] { visibility: hidden !important; }
+.fx-root .fx-scrim { position: absolute; inset: 0; background: var(--fx-scrim, rgba(0, 0, 0, 0.55)) !important; border: 0 !important; box-shadow: none !important; padding: 0; cursor: pointer; }
+.fx-sheet { position: relative; width: min(560px, 100%); max-height: min(86dvh, 760px); overflow: auto; margin: 0; }
+.fx-sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.fx-sheet-head h2 { margin: 0; }
+.fx-sheet-body { padding-top: 10px; }
+@media (max-width: 900px) {
+  .fx-topbar { flex-wrap: nowrap; }
+  .fx-topbar .fx-tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; flex: 1 1 auto; min-width: 0; }
+  .fx-topbar .fx-tabs button { white-space: nowrap; padding: 8px 10px; font-size: 0.9em; }
+  .fx-compose-btn { flex: none; white-space: nowrap; }
+  .fx-layout { grid-template-columns: minmax(0, 1fr); }
+  .fx-aside { position: static; }
+  .fx-aside .fx-trending { display: none; }
+  .fx-search-trending { display: block; }
+  .fx-stream { max-height: calc(100dvh - var(--fx-offset-mobile, 170px)); padding-right: 2px; }
+  .fx-post { min-height: calc(100dvh - var(--fx-offset-mobile, 170px) - 8px); }
+  .fx-post.fx-post-text { min-height: 0; }
+  .fx-media video, .fx-media img { max-height: calc(100dvh - var(--fx-offset-mobile, 170px) - 190px); }
+  .fx-sheet-wrap { place-items: end center; padding: 0; }
+  .fx-sheet { width: 100%; max-height: 88dvh; }
+}
+@media (max-width: 560px) {
+  /* Phones: short "Search" label and tighter tabs so all four tabs (including "You") fit beside Post. */
+  .fx-tab-long { display: none; }
+  .fx-tab-short { display: inline; }
+  /* If a wide (e.g. monospace) site font still can't fit tabs + Post on one row, Post drops to its own row instead of covering "You". */
+  .fx-topbar { gap: 6px; flex-wrap: wrap; }
+  .fx-topbar .fx-tabs { gap: 4px; flex: 0 1 auto; min-width: auto; overflow: visible; }
+  .fx-compose-btn { margin-left: auto; }
+  .fx-topbar .fx-tabs button { padding: 7px 8px; font-size: 0.85em; }
+  .fx-compose-btn { padding-left: 10px; padding-right: 10px; }
+}

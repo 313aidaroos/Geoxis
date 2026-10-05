@@ -99,22 +99,31 @@ test("cixy system prompt says none in view when empty", () => {
   assert.match(cixySystemPrompt({}), /none in view/);
 });
 
-test("cixy embeds Muslim identity in system prompt", () => {
+test("cixy core: Arab culture line, no Muslim/religious greetings/phrases/rules (Awad's lock, 2026-10-04)", () => {
   const prompt = cixySystemPrompt({ tenant: "test", assets: [] });
-  assert.match(prompt, /Muslim/);
-  assert.match(prompt, /As-salamu alaykum/);
-  assert.match(prompt, /Insha'Allah/);
-  assert.match(prompt, /alhamdulillah/);
-  assert.match(prompt, /Clean recommendations/);
+  assert.match(prompt, /draws on Arab culture: hospitality, courtesy, patience/);
+  assert.doesNotMatch(prompt, /salam|as-salamu|alaykum/i);
+  assert.doesNotMatch(prompt, /insha'?allah|alhamdulillah|bismillah|masha'?allah/i);
+  assert.doesNotMatch(prompt, /halal|haram|alcohol|pork|interest-based|gambling|prayer/i);
+  assert.doesNotMatch(prompt, /religious ruling|scholar|fatwa/i);
+  assert.doesNotMatch(prompt, /Muslim|Islam/i);
   assert.match(prompt, /never fabricate/);
 });
 
-test("cixy merges Muslim identity with domain expertise", () => {
+test("cixy merges shared core with domain expertise", () => {
   const prompt = cixySystemPrompt({ tenant: "acme", assets: [{ id: "T1", name: "Truck 1", latitude: 51.9, longitude: 4.1 }] });
-  assert.match(prompt, /Muslim/);
+  assert.match(prompt, /You are Cixy/);
   assert.match(prompt, /fleet telematics/);
   assert.match(prompt, /Truck 1/);
   assert.match(prompt, /Tenant: acme/);
+});
+
+test("cixy model: AI_MODEL env or claude-sonnet-5, never the retired sonnet-4 snapshot", async () => {
+  const { cixyModel } = await import("../lib/core.js");
+  assert.equal(cixyModel({}), "claude-sonnet-5");
+  assert.equal(cixyModel({ AI_MODEL: " claude-sonnet-5-5 " }), "claude-sonnet-5-5");
+  const r = cixyRequest({ apiKey: "k", messages: [{ role: "user", content: "hi" }] });
+  assert.notEqual(r.body.model, "claude-sonnet-4-20250514");
 });
 
 test("owner admin allowlist: both owner emails, case-insensitive, ADMIN_EMAILS adds", async () => {

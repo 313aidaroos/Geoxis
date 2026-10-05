@@ -163,6 +163,19 @@ Read-only backfill of everything that changed after the 2026-09-27 entries above
 - Who: Grok.
 - Undo: `git revert <squash SHA>` and delete `ADMIN_EMAILS` in Vercel → spatial-dashboard → Settings → Environment Variables.
 
+## 2026-10-04 (CT) — Grok Bot: Feed tab on Geoxis (PR open, NOT merged)
+- Why: Awad asked for the Socixis Social family feed as a Feed tab on every Ixis site. Awad put feed changes on hold, so this PR is for preview review only; do not merge until Awad says so.
+- What: new public `/feed` page in Geoxis's own shell (same header, footer, fonts, colors and buttons). For You is the unfiltered mixed feed from every Apixis company with source-site badges and AI labels; Following, Search · Trending and You tabs; video/photo/text posts, like, comment, follow, save, share, report, tips and boosts in Ixis. Signed-out visitors can browse; the 4th tab says "You" and shows a sign-in card (Apixis ID). Text-only posts use the site's body font, wrap long words and size to their content; media posts keep the full-height layout; feed modals sit above everything.
+- Where: `spatial-dashboard/public/feed.html` (static page with the globe's own top-bar look: Geoxis brand, Login/Support/Admin, family links; Tailwind config and Special Elite font copied from index.html; "◎" glyph instead of the inline globe SVG), `spatial-dashboard/public/feed.css`, `spatial-dashboard/public/js/feed/feed-app.js` (esbuild bundle of `spatial-dashboard/feed-client/`), `spatial-dashboard/api/feed-session.js` (Geoxis keeps its Supabase token in localStorage, so the page sends it as a Bearer header via the new optional `sessionHeaders` client option), "Feed →" link in `index.html` family nav and in `public/companies.html`.
+- Backend: https://www.apixis.dev/api/feed. `/api/feed-session` calls POST /api/feed/session server-side with the existing `APIXIS_WORLD_KEY` + X-Apixis-Client/Sub/Email and returns the short-lived fdt_ token. No new env vars, no DB change, no SVGs.
+- Who: Grok Bot (for Awad).
+- Undo: close this PR, or `git revert <squash sha>` if it is ever merged.
+
+## 2026-10-04 19:00 (CT) — Grok Bot: Feed phone tab fit (same PR, still NOT merged)
+- What: at 375px the 4th "You" tab was pushed off-screen by "Search · Trending". Under 560px the tab now reads "Search", tabs are tighter, and if a wide site font still can't fit the tabs and "+ Post" on one row, Post drops to its own row instead of covering "You". Desktop is unchanged; the site's colors, fonts and buttons are untouched; no SVGs.
+- Where: feed client `FeedView.tsx` (tab label) and the shared layout section of the site's feed CSS.
+- Who: Grok Bot (for Awad). No merge, no production deploy.
+- Undo: revert this commit on the PR branch.
 ## 2026-10-04 — Owner admin row in prod (Grok)
 - What: inserted ('alaidaroosawad@gmail.com','owner') into prod public.admin_emails on Supabase ncifprfgastofurrlsko via the MCP. Both owner emails are now present. Owner bypass check: Geoxis has no product paywalls to skip, since plans are not on sale (api/redeem.js returns not_on_sale) and nothing reads entitlements. No code change.
 - Who: Grok.
@@ -178,6 +191,60 @@ The entries below record the day's observed commits and merged PRs. Existing det
 ### Merged PRs
 - PR #18, merge `9a477c6`, `grok/notes-admin-row` → `main`, merged 2026-10-04 CT by 313aidaroos: NOTES: gmail owner row added to prod admin_emails. Undo: `git revert 9a477c6`.
 - PR #17, merge `cd656ff`, `grok/owner-admin-allowlist` → `main`, merged 2026-10-04 CT by 313aidaroos: Owner admin allowlist for alaidaroosawad@gmail.com and awad@apixis.dev. Undo: `git revert cd656ff`.
+
+## 2026-09-29 (CT) — "Other Ixis companies" footer (Geoxis Lead / Grok)
+- **What:** Awad-approved footer section linking the other Ixis sites (Geoxis itself left out; Nexxis/Omnixis, Launchixis, PersonalContentBot, AwadBot, COMMAND excluded). Plain text links, `target="_blank" rel="noopener"`, wrap on narrow screens.
+- **Files:** `spatial-dashboard/src/ixisCompanies.js` (new: the single list + renderer into `[data-ixis-companies]`); `index.html` (small block at the bottom of the left sidebar, just above the feed-status bar, so nothing covers the map); `login.html`, `support.html`, `admin.html` (minimal `<footer>` at the bottom of the existing card using the page's existing `border-line` / `text-slate-500` / `text-slate-400 hover:text-emerald-300` styles). Each page loads `/src/ixisCompanies.js`.
+- **Undo:** revert the PR (or delete `src/ixisCompanies.js`, the four `<footer>…data-ixis-companies…</footer>` blocks and the four `<script src="/src/ixisCompanies.js">` tags).
+- **2026-09-29 (CT) update:** removed Nursery Toons and Qahwah World from `src/ixisCompanies.js` (Awad-approved); list is now 11 sites.
+
+## 2026-10-04 (CT) — Grok: PR #7 brought up to date with main
+- What: merged main (`cca2d9e`) into `geoxis-lead/ixis-footer` via `gh api` (merge commit, no force-push) and re-applied the footer blocks onto main's current `index.html` / `login.html` / `support.html` / `admin.html`. No content or style change to the footer itself. The globe now has both the Codex "Apixis Companies →" link (to `/companies`, 15 cards) and this footer (11 links); Awad may want only one.
+- Who: Grok (Geoxis Lead), hub dispatch 2026-10-04 ~19:00 CT.
+- Undo: revert the PR after merge, or close it.
+
+## 2026-10-04 (CT) — Grok: provenance for unlogged items since 2026-10-02
+- `dd294cc` (18:24 CT, 313aidaroos, **pushed straight to main, no PR**, during the freeze): "notes: 2026-10-04 catch-up", `NOTES/GROK.md` only. Side effect: it deleted this file's intro line and duplicated the "2026-10-04 summary" heading; repaired by `cca2d9e` below. Who: Grok (catch-up job). Undo: `git revert dd294cc`.
+- `cca2d9e` (18:53 CT, 313aidaroos, **pushed straight to main, no PR**, during the freeze): "notes: fix 10-04 catch-up", `NOTES/GROK.md` only; restored the intro line and corrected the Claude line. Who: Grok (catch-up job). Undo: `git revert cca2d9e`.
+- PR #20 / `4c09ca2` (18:31 CT, branch `claude/great-fermi-6brq7a`): Claude's full-portfolio review, adds `NOTES/CLAUDE.md` + an `AI_CHANGELOG.md` line. Notes only, no code/env/DB. Who: Claude (Claude Code). Undo: `git revert 4c09ca2`.
+- Vercel env `ANTHROPIC_API_KEY` on project `spatial-dashboard` was updated 2026-10-04 12:00 CT by the 313aidaroos account (seen in env metadata; value not read). Status: **unattributed, under hub review**. It looks family-wide (Deduxis and PersonalContentBot saw the same change), but who did it and why is unconfirmed. The key itself was not touched. Undo: none from here; the hub decides after its review.
+- Vercel env `ADMIN_EMAILS` created 17:44 CT (production + preview) — already logged under PR #17 above.
+
+## 2026-10-04 (CT) — Grok: claude-review-fixes (branch `geoxis-lead/claude-review-fixes`, one PR, NOT merged/deployed)
+- What / where:
+  1. `spatial-dashboard/api/world/provision.js`: import `../../lib/supabaseServer.js` (was `../lib/…`, which doesn't exist, so the function crashed on load: live GET/POST = 500 FUNCTION_INVOCATION_FAILED). Metadata save now uses the Supabase Auth admin REST endpoint with `envConfig().url/serviceKey` (it used `@supabase/supabase-js`, which isn't a dependency, and wrong field names). Error body no longer echoes `err.message`.
+  2. `spatial-dashboard/src/apixisWorld.js`: sends the session Bearer token (it sent none, so it always got 401); skips the call when signed out.
+  3. `spatial-dashboard/lib/core.js`: Cixy model = `process.env.AI_MODEL || "claude-sonnet-5"` (new `cixyModel()`); it was `claude-sonnet-4-20250514`, retired 2026-06-15 — live POST /api/cixy answered 503 "Cixy is resting".
+  4. `spatial-dashboard/lib/apixis-cixy.js`: the culture line now reads "Your character draws on Arab culture: warm hospitality, generosity, respect and directness." (changed 2026-10-04 ~19:00 CT on the hub's instruction from "Arab and Muslim culture"). Removed (Halaxis-only): the word "Muslim", religious greetings (Salam / As-salamu alaykum), religious phrases (Insha'Allah / alhamdulillah), halal/religious rules (alcohol/pork/gambling/interest), the religious-ruling line and the "faith" wording. Kept honesty and the Ixis/Wallet rules. This Geoxis copy now differs from the canonical `ApixisWallet/docs/CIXY.md` text.
+  5. `spatial-dashboard/test/core.test.mjs`: tests require the Arab culture line and assert that "Muslim"/"Islam", the banned greetings, phrases, rules and rulings are absent. New test for `cixyModel()`.
+  6. `spatial-dashboard/docs/PROVISION_KIT.md`: "200 starter Ixis" → 1,000 (granted once on Apixis.dev). `spatial-dashboard/admin.html`: subtitle names both owner emails (text only, same styling).
+- Not changed: the owner admin allowlist (already both emails since PR #17; `ADMIN_EMAILS` env holds both), Vercel env/protection, Supabase, Wallet, Stripe. No SVGs were removed: Claude added none since 10-02.
+- Who: Grok (Geoxis Lead), at Awad's request via the Developer Bot hub, 2026-10-04 18:43 CT.
+- Undo: close the PR without merging; after a merge, `git revert <squash SHA>`.
+
+## 2026-10-04 (CT) — Grok (Geoxis Lead): AI_MODEL env + merge of PR #21
+- Who: Geoxis Lead (Grok), on the Developer Bot hub's 18:55 CT order relaying Awad (lifts the freeze for PR #21 and PR #7 only).
+- What / where:
+  1. Vercel env `AI_MODEL=claude-sonnet-5` (plain) added ~19:13 CT on project `spatial-dashboard` (team `313aidaroos-projects`), targets production + preview, env id `rKc55dZWD1YNEtvC`. `lib/core.js` `cixyModel()` reads it at runtime. No other env var touched; `ANTHROPIC_API_KEY` not read or changed.
+  2. PR #21 (`geoxis-lead/claude-review-fixes`) squash-merged to `main` after green checks (ci x2, Vercel); the push to main auto-deploys production.
+- Undo: delete env `rKc55dZWD1YNEtvC` in Vercel (code falls back to `claude-sonnet-5`, so also revert if needed); `git revert <PR #21 squash SHA>` (SHA recorded in the PR #7 notes entry).
+
+## 2026-10-04 19:13 (CT) — Grok Bot: Feed PR #19 approved for production by Awad
+- Why: Awad said "make it live" at 7:13 PM CT on Oct 4, 2026, approving the squash-merge of this PR and the production deploy that follows from main.
+- What: squash-merge of PR #19 (feed files + Feed nav entry only); Vercel's Git integration deploys main to production.
+- Who: Grok Bot (for Awad).
+- Undo: `git revert <squash sha of PR #19>` on main and push (the squash sha is on the PR page and in /workspace/feed/STATUS.md), or in Vercel promote the previous production deployment (instant rollback) and then revert.
+## 2026-10-04 (CT) — Grok (Developer Bot hub): Cixy persona v2 sync + Ominix link
+- What: Follow-up to lead PR #21 (merged 14b3481; its provision and model fixes untouched): spatial-dashboard/lib/apixis-cixy.js (JS port) replaced with v2 (core text identical to the TS kit); test expects the v2 Arab-culture line. Ominix link in spatial-dashboard/public/companies.html now https://ominix-app.vercel.app (URL string only).
+- Files: spatial-dashboard/lib/apixis-cixy.js spatial-dashboard/public/companies.html spatial-dashboard/test/core.test.mjs 
+- Why: Awad's lock — no religious content in Cixy on any product except Halaxis; she declines only genuinely harmful, deceptive or illegal content, never on religious grounds (9/30). Kit = ApixisWallet `sdk/apixis-cixy.*` v2 (3a22244, PR #50) with two hub edits pending canonical: the religion-derived "clean recommendations" rule (gambling) is replaced by "decline only harmful, deceptive or illegal, never on religious grounds", and the character line reads "draws on Arab culture". Ominix links point to https://ominix-app.vercel.app (checked 200 on 2026-10-04 ~6:55 PM CT).
+- Who: Grok (Developer Bot hub), branch `grok/cixy-v2-20261004`, one squash-merged PR.
+- Undo: `git revert <squash sha of this PR>` (sha recorded in the PR), then redeploy prod.
+
+## 2026-10-04 (CT) — Grok (Geoxis Lead): PR #21 deployed + PR #7 merge
+- Who: Geoxis Lead (Grok), Developer Bot hub order 18:55 CT relaying Awad.
+- PR #21 squash SHA `14b348166bc6e34a797e376edba810032df5e734` (merged 19:14 CT); production deployment `dpl_aTi5evjQuBD6yCVKLqmB78dt5eeU` READY. Prod smoke: GET /api/world/provision 405, signed-out POST 401 (was 500); POST /api/cixy 200 with a normal English greeting (no religious greeting); /, /login, /support, /admin, /companies 200. Undo: `git revert 14b3481`.
+- PR #7 (`geoxis-lead/ixis-footer`): main (`14b3481`, then `03b7d92` after the hub merged PR #23) merged into the branch via the GitHub API (merge commit, no force-push); `NOTES/GROK.md` + `AI_CHANGELOG.md` append conflicts resolved by keeping both sides; `admin.html` auto-merged (footer + both-owner subtitle). Then squash-merged to `main` (prod auto-deploy). Undo: `git revert <PR #7 squash SHA>`.
 
 ## 2026-10-04 (CT) — Grok: Apixis ID is the only signup (branch `geoxis-lead/apixis-only-signup`, PR, NOT merged)
 - What: magic-link requests now send `create_user: false` / `should_create_user: false` (they sent `true`, so any email could create a local Supabase account). An unknown email gets "No Geoxis account uses this email yet. New here? Use Sign in with Apixis…". One muted hint line under the Apixis button on `/login` (existing `text-slate-500` style, no redesign). Password stays as sign-in for existing accounts; the code has no password signup (login uses `signInWithPassword`, `/set-password` only updates a signed-in user). New accounts come only from the Apixis ID callback (`lib/apixis-login.js`).
