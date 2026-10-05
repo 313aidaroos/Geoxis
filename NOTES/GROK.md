@@ -227,3 +227,7 @@ The entries below record the day's observed commits and merged PRs. Existing det
 - Who: Geoxis Lead (Grok), Developer Bot hub order 18:55 CT relaying Awad.
 - PR #21 squash SHA `14b348166bc6e34a797e376edba810032df5e734` (merged 19:14 CT); production deployment `dpl_aTi5evjQuBD6yCVKLqmB78dt5eeU` READY. Prod smoke: GET /api/world/provision 405, signed-out POST 401 (was 500); POST /api/cixy 200 with a normal English greeting (no religious greeting); /, /login, /support, /admin, /companies 200. Undo: `git revert 14b3481`.
 - PR #7 (`geoxis-lead/ixis-footer`): main (`14b3481`, then `03b7d92` after the hub merged PR #23) merged into the branch via the GitHub API (merge commit, no force-push); `NOTES/GROK.md` + `AI_CHANGELOG.md` append conflicts resolved by keeping both sides; `admin.html` auto-merged (footer + both-owner subtitle). Then squash-merged to `main` (prod auto-deploy). Undo: `git revert <PR #7 squash SHA>`.
+
+## 2026-10-04 (CT) — Grok (Geoxis Lead): after-the-fact record for PR #7
+- PR #7 squash SHA `d471ddd050914068d5e7f2e6b25de5d164aa7e07` (merged 19:17 CT); production deployment `dpl_ELY6dUmxSUWuV5pALhSYa8pMhf93` READY. Live check: "Other Ixis companies" present in the HTML of /, /login, /support, /admin. Re-smoke on this deploy: provision GET 405 / POST 401; Cixy "hi" 200; /, /login, /support, /admin, /companies 200.
+- Who: Geoxis Lead (Grok). Undo: `git revert d471ddd` (footer); `git revert 14b3481` (#21); delete Vercel env `rKc55dZWD1YNEtvC` (AI_MODEL).
