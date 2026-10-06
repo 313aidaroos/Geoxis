@@ -27,3 +27,20 @@ Dated notes from Claude (Claude Code), same purpose as `NOTES/GROK.md`: what Cla
 - Revoke anon EXECUTE on `is_admin_user()` / `is_member()`.
 - `spatial-dashboard/public/companies.html` links Ominix to `nexxis-tau.vercel.app`; `spatial-dashboard/docs/PROVISION_KIT.md` still says 200 starter Ixis.
 - The Wallet's return-host list includes `geoxis.vercel.app`, which is not this project (harmless; tidy).
+
+## 2026-10-06 (UTC) — Claude: build/auth/redeem fixes + real-fleet ingest (branch `claude/zealous-wozniak-p1zp30`)
+
+### Found (code, not in any earlier note)
+- Only index/login/support/admin were in the Vite build. `pricing.html`, `set-password.html` and `auth/callback.html` 404ed in production, so magic-link sign-in for existing accounts was broken (Grok flagged it 2026-09-27 as pre-existing; never fixed). Apixis ID sign-in was unaffected.
+- The globe poller never sent the session token, so the tenant branch of `/api/assets` was unreachable from the UI, and nothing anywhere wrote to `tracked_assets` / `asset_positions`. The "6 live tracked assets" in the notes are the hard-coded demo fleet in `lib/fleetEngine.js`.
+- `pricing.html` called `/api/redeem` without the token → 401 before the not-on-sale check. Provision/unprovision were TODO stubs.
+- `api/admin/support.js` forwarded a `reply` field the table does not have.
+
+### Changed
+See the 2026-10-06 table in `docs/LAUNCH_NOTES.md` and `docs/INGEST.md`. `npm test` 20 tests green, `npm run build` green with 9 HTML pages in `dist/`.
+
+### Needs Awad
+- Supabase SQL editor: paste `sql/003_revoke_anon_execute.sql` then `sql/004_ingest_keys_entitlements.sql`.
+- Delete the root Meridian files + `spatial-dashboard/src/aiController.js` (`git rm`; this session was not allowed to delete files).
+- Point `geoxis.vercel.app` at the `spatial-dashboard` project; flip `PLANS_ON_SALE` when ready.
+- If the Supabase redirect allowlist is exact-match, keep `/auth/callback.html` (unchanged) in it.

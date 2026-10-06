@@ -42,7 +42,7 @@
         }
       } catch (err) {
         console.error("[callback] PKCE exchange failed:", err);
-        location.href = "/login.html";
+        location.href = "/login";
       }
     } else {
       // Hash-based token already consumed, redirect to set-password or next
@@ -62,7 +62,7 @@
             location.href = safe;
           }
         } else {
-          location.href = "/login.html";
+          location.href = "/login";
         }
       }, 500);
     }

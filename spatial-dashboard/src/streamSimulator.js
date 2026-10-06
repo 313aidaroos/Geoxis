@@ -308,19 +308,31 @@ export class HttpTelemetryPoller {
   static CLOSING = 2;
   static CLOSED = 3;
 
-  constructor({ url, intervalMs }) {
+  /**
+   * @param {object} opts
+   * @param {string} opts.url
+   * @param {number} opts.intervalMs
+   * @param {() => Record<string,string>} [opts.headers]  e.g. the session Bearer header (2026-10-06, Claude):
+   *   with it /api/assets answers the signed-in tenant's own fleet; a 401 falls back to the public feed.
+   */
+  constructor({ url, intervalMs, headers = null }) {
     this.readyState = HttpTelemetryPoller.CONNECTING;
     this.onopen = null;
     this.onmessage = null;
     this.onclose = null;
     this.onerror = null;
+    this.onmeta = null;
+    this.onunauthorized = null;
     this.#url = url;
     this.#intervalMs = intervalMs;
+    this.#headers = typeof headers === "function" ? headers : null;
     this.#timer = setTimeout(() => this.#open(), 40);
   }
 
   #url;
   #intervalMs;
+  #headers;
+  #authFailed = false;
   #timer;
   #closed = false;
   #inflight = false;
@@ -338,11 +350,19 @@ export class HttpTelemetryPoller {
     if (this.readyState !== HttpTelemetryPoller.OPEN || this.#inflight) return;
     this.#inflight = true;
     try {
-      const res = await fetch(this.#url, { cache: "no-store" });
+      const auth = this.#headers && !this.#authFailed ? this.#headers() : {};
+      let res = await fetch(this.#url, { cache: "no-store", headers: auth });
+      if (res.status === 401 && Object.keys(auth).length) {
+        // Stale session token: tell the app, then keep the public feed flowing.
+        this.#authFailed = true;
+        this.onunauthorized?.();
+        res = await fetch(this.#url, { cache: "no-store" });
+      }
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       const sentAt = typeof json.sentAt === "number" ? json.sentAt : Date.now();
       const assets = Array.isArray(json.assets) ? json.assets : [];
+      this.onmeta?.({ tenant: json.tenant ?? null, demo: json.demo !== false, sources: json.sources ?? {} });
       for (const frame of assets) {
         this.onmessage?.({
           data: JSON.stringify({ channel: "telemetry", sentAt, payload: frame }),
@@ -381,14 +401,16 @@ export class AssetDataStreamer {
    * @param {number} opts.intervalMs
    * @param {number} opts.targetCount
    * @param {string} [opts.endpoint]  http(s) poll URL or wss:// socket
+   * @param {() => Record<string,string>} [opts.headers]  extra headers for the HTTP poller (session token)
    */
-  constructor({ bus, origin, radiusKm = 50, intervalMs = 2000, targetCount = 6, endpoint = "/api/assets" }) {
+  constructor({ bus, origin, radiusKm = 50, intervalMs = 2000, targetCount = 6, endpoint = "/api/assets", headers = null }) {
     this.bus = bus;
     this.origin = origin;
     this.radiusKm = radiusKm;
     this.intervalMs = intervalMs;
     this.targetCount = targetCount;
     this.endpoint = endpoint;
+    this.headers = headers;
 
     this.socket = null;
     this.reconnectAttempts = 0;
@@ -415,7 +437,9 @@ export class AssetDataStreamer {
     if (endpoint && (endpoint.startsWith("ws://") || endpoint.startsWith("wss://"))) {
       this.socket = new WebSocket(endpoint);
     } else if (endpoint) {
-      this.socket = new HttpTelemetryPoller({ url: endpoint, intervalMs: this.intervalMs });
+      this.socket = new HttpTelemetryPoller({ url: endpoint, intervalMs: this.intervalMs, headers: this.headers });
+      this.socket.onmeta = (meta) => this.bus.emit("stream:meta", meta);
+      this.socket.onunauthorized = () => this.bus.emit("stream:unauthorized");
     } else {
       const fleet = buildFleet(this.origin, this.radiusKm, this.targetCount);
       this.socket = new MockTransponderSocket({

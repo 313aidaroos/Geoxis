@@ -329,14 +329,11 @@ export class UIController {
     const modal = $("settingsModal");
     const form = $("settingsForm");
     const gInput = $("keyGoogle");
-    const oInput = $("keyOpenAI");
 
     const open = () => {
       const s = this.settings.getAll();
       gInput.value = s.googleMapsKey;
-      oInput.value = s.openaiKey;
       gInput.placeholder = s.googleMapsKey ? SettingsManager.mask(s.googleMapsKey) : "AIza…";
-      oInput.placeholder = s.openaiKey ? SettingsManager.mask(s.openaiKey) : "sk-…";
       this.#clearFieldErrors();
       modal.classList.remove("hidden");
       gInput.focus();
@@ -351,10 +348,10 @@ export class UIController {
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       this.#clearFieldErrors();
-      const result = this.settings.saveKeys({ googleMapsKey: gInput.value, openaiKey: oInput.value });
+      const result = this.settings.saveKeys({ googleMapsKey: gInput.value });
       if (!result.ok) {
-        for (const [field, message] of Object.entries(result.errors)) {
-          const inputId = field === "googleMapsKey" ? "keyGoogle" : "keyOpenAI";
+        for (const [, message] of Object.entries(result.errors)) {
+          const inputId = "keyGoogle";
           $(inputId).classList.add("invalid");
           const err = form.querySelector(`.field-error[data-for="${inputId}"]`);
           err.textContent = message;
@@ -370,7 +367,6 @@ export class UIController {
     $("btnClearKeys").addEventListener("click", async () => {
       this.settings.clearKeys();
       gInput.value = "";
-      oInput.value = "";
       close();
       this.toast("Stored keys removed.");
       await this.engine.applySettings();

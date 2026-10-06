@@ -10,4 +10,8 @@ npm install
 npm run dev
 ```
 
-No keys required for the default globe and the live feed. Google Map Tiles and OpenAI are optional (settings gear).
+No keys required for the default globe and the live feed. A Google Map Tiles key is optional (settings gear). Cixy runs on the server (`ANTHROPIC_API_KEY`).
+
+Your own fleet: sign in, create an ingest key, and post positions to `POST /api/positions`. See [`spatial-dashboard/docs/INGEST.md`](spatial-dashboard/docs/INGEST.md).
+
+The other files at the repo root (`index.html`, `main.js`, `*Controller.js`, `streamSimulator.js`, `README-2.md`) are the old "Meridian" prototype. They are not deployed and can be deleted.
