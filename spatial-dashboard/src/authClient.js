@@ -44,6 +44,8 @@ export async function requestMagicLink(email, next = "/") {
   const cfg = await config();
   if (!cfg.supabaseUrl || !cfg.supabaseAnonKey) throw new Error("auth_not_configured");
   const safeNext = next && next.startsWith("/") && !next.startsWith("//") ? next : "/";
+  // auth/callback.html is in the Vite build since 2026-10-06 (it 404ed before). The .html URL is kept so the
+  // Supabase redirect allowlist needs no change; Vercel cleanUrls 308s it to /auth/callback with query + hash intact.
   const redirectTo = `${location.origin}/auth/callback.html?next=${encodeURIComponent(safeNext)}`;
   const res = await fetch(`${cfg.supabaseUrl}/auth/v1/otp`, {
     method: "POST",

@@ -11,6 +11,7 @@ import { AssetDataStreamer } from "./streamSimulator.js";
 import { SpatialAIAgent } from "./cixyController.js";
 import { UIController } from "./uiController.js";
 import { provisionIfNeeded, showWelcomeCard } from "./apixisWorld.js";
+import { authHeader, clearSession } from "./authClient.js";
 
 /* ------------------------------------------------------------------ */
 /*  Event bus                                                          */
@@ -56,13 +57,6 @@ const KEY_RULES = {
     validate: (v) => /^AIza[0-9A-Za-z_-]{35}$/.test(v),
     hint: "Google keys start with AIza and are 39 characters long.",
   },
-  openaiKey: {
-    label: "OpenAI API key",
-    optional: true,
-    // Accept classic sk-… and project keys sk-proj-…; only shape is checked.
-    validate: (v) => /^sk-[A-Za-z0-9_-]{20,}$/.test(v),
-    hint: "OpenAI keys start with sk- followed by at least 20 characters.",
-  },
 };
 
 export class SettingsManager {
@@ -105,9 +99,7 @@ export class SettingsManager {
     if (!this.#cache) {
       this.#cache = {
         googleMapsKey: this.#read("googleMapsKey", ""),
-        openaiKey: this.#read("openaiKey", ""),
         layers: this.#read("layers", { fleet: true, weather: false, risk: true, trails: true }),
-        aiModel: this.#read("aiModel", "gpt-realtime"),
       };
     }
     return { ...this.#cache };
@@ -297,6 +289,8 @@ export class B2BSaasEngine {
       intervalMs: this.config.streamIntervalMs,
       targetCount: this.config.streamTargetCount,
       endpoint: "/api/assets",
+      // Signed in → /api/assets answers this tenant's own fleet (POST /api/positions feeds it).
+      headers: () => authHeader(),
     });
     this.#wireStream();
     this.stream.connect();
@@ -326,13 +320,11 @@ export class B2BSaasEngine {
     }
     }
 
-    // 4. AI agent (lazy-connects when the panel is opened and a key exists).
+    // 4. Cixy (server-side /api/cixy; no browser key).
     this.ai = new SpatialAIAgent({
       bus: this.bus,
       state: this.state,
       map: this.map,
-      getApiKey: () => this.settings.getKey("openaiKey"),
-      model: this.settings.getAll().aiModel,
     });
 
     this.#startStaleSweep();
@@ -367,6 +359,21 @@ export class B2BSaasEngine {
     });
     this.bus.on("stream:latency", (ms) => this.state.setLatency(ms));
     this.bus.on("stream:status", (status) => this.state.setFeedStatus(status));
+    // Once per page: say whose fleet is on the globe (2026-10-06, Claude).
+    let told = false;
+    this.bus.on("stream:meta", ({ tenant, demo }) => {
+      if (told || !tenant) return;
+      told = true;
+      if (demo) {
+        this.ui.toast(`No positions yet for ${tenant.name || tenant.slug}. Showing the demo fleet. Post yours to /api/positions (docs/INGEST.md).`);
+      } else {
+        this.ui.toast(`Live: ${tenant.name || tenant.slug}'s fleet.`);
+      }
+    });
+    this.bus.on("stream:unauthorized", () => {
+      clearSession();
+      this.ui.toast("Your session expired. Showing the public feed; sign in again for your fleet.", "error");
+    });
   }
 
   #replayMarkers() {
@@ -407,8 +414,7 @@ export class B2BSaasEngine {
   /** Called by the UI after keys are saved so live modules pick them up. */
   async applySettings() {
     const { googleMapsKey } = this.settings.getAll();
-    await this.map.setGoogleTiles(googleMapsKey);
-    this.ai?.reconfigure({ apiKey: this.settings.getKey("openaiKey") });
+    await this.map?.setGoogleTiles(googleMapsKey);
   }
 
   shutdown() {

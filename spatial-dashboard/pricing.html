@@ -81,7 +81,7 @@
   </main>
 
   <script type="module">
-    import { loadMe } from "/src/authClient.js";
+    import { loadMe, authHeader } from "/src/authClient.js";
 
     const loadingState = document.getElementById("loadingState");
     const pricingGrid = document.getElementById("pricingGrid");
@@ -116,7 +116,8 @@
         try {
           const res = await fetch("/api/redeem", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            // 2026-10-06 (Claude): the session token was never sent, so /api/redeem always answered 401.
+            headers: { "Content-Type": "application/json", ...authHeader() },
             body: JSON.stringify({ productKey, attemptId }),
           });
           const data = await res.json();

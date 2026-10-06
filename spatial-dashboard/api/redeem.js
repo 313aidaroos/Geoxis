@@ -1,6 +1,8 @@
 // Change note (Claude, Sep 2026): 'Not on sale' instead of an error. See docs/LAUNCH_NOTES.md.
-import { authContext, sendJson } from "../lib/supabaseServer.js";
+// Change note (Claude, Oct 2026): provision/unprovision now write the entitlement row (sql/004) instead of a TODO.
+import { authContext, deleteWhere, patchWhere, sendJson, upsert } from "../lib/supabaseServer.js";
 import { redeem, isWalletConfigured } from "../lib/apixis-wallet.js";
+import { entitlementExpiry } from "../lib/ingest.js";
 
 async function readBody(req) {
   if (req.body && typeof req.body === "object") return req.body;
@@ -10,8 +12,8 @@ async function readBody(req) {
   return text ? JSON.parse(text) : {};
 }
 
-// The geoxis.* plans are not in the Wallet catalog yet and provision writes no access row.
-// Flip to true only when both exist, so nobody is charged for access we don't deliver.
+// geoxis.tracking.* and geoxis.export.report are in the Wallet catalog and provision writes the access row
+// (public.entitlements, sql/004). Awad flips this when Geoxis is ready to sell (OWNER_CHECKLIST).
 const PLANS_ON_SALE = false;
 
 export default async function handler(req, res) {
@@ -49,16 +51,30 @@ export default async function handler(req, res) {
     // Idempotency key: user + product + client attemptId (stable per click retry)
     const idempotencyKey = `geoxis-${ctx.user.id.slice(0, 8)}-${productKey}-${attemptId}`.slice(0, 80);
 
+    let reservationId = null;
     const result = await redeem({
       owner,
       productKey,
       idempotencyKey,
-      provision: async () => {
-        // TODO: Write entitlement/subscription row here
-        return { success: true };
+      // Runs after the Wallet hold and before capture: grant the access this product promises.
+      provision: async (held) => {
+        reservationId = String(held.reservationId);
+        // Upsert on reservation_id: a retried click returns the same Wallet hold and must not fail or duplicate.
+        const row = await upsert("entitlements", {
+          tenant_id: ctx.tenant.id,
+          user_id: ctx.user.id,
+          owner,
+          product_key: productKey,
+          reservation_id: reservationId,
+          status: "active",
+          expires_at: entitlementExpiry(productKey),
+        }, "reservation_id");
+        return { entitlementRowId: row.id };
       },
+      // Capture failed → the person was not charged, so take the access back before the hold is released.
+      // Only a row with no receipt: a captured hold means charged (family rule 3), that access is never removed here.
       unprovision: async () => {
-        // TODO: Delete the entitlement/subscription row written in provision
+        if (reservationId) await deleteWhere("entitlements", `reservation_id=eq.${encodeURIComponent(reservationId)}&receipt_id=is.null`);
       },
     });
 
@@ -70,9 +86,19 @@ export default async function handler(req, res) {
       });
     }
 
+    // Captured = charged (family rule 3). Record the Wallet receipt on the access row; never undo it from here.
+    if (reservationId) {
+      await patchWhere("entitlements", `reservation_id=eq.${encodeURIComponent(reservationId)}`, {
+        receipt_id: result.receiptId ?? null,
+        wallet_entitlement_id: result.entitlementId ?? null,
+      }).catch((e) => console.error("[redeem] receipt save failed:", e));
+    }
+
     return sendJson(res, 200, {
       success: true,
       entitlementId: result.entitlementId,
+      receiptId: result.receiptId,
+      expiresAt: entitlementExpiry(productKey),
       message: "Plan activated successfully!",
     });
   } catch (err) {

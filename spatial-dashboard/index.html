@@ -201,7 +201,7 @@
     <div class="w-[440px] rounded-lg bg-surface-1 border border-line shadow-2xl">
       <div class="px-5 py-4 border-b border-line">
         <h2 id="settingsTitle" class="text-[15px] font-medium text-slate-100">Connect your services</h2>
-        <p class="mt-1 text-[12px] text-slate-500">Keys are stored only in this browser's local storage and sent directly to each provider.</p>
+        <p class="mt-1 text-[12px] text-slate-500">Keys are stored only in this browser's local storage and sent directly to each provider. Cixy runs on the server and needs no key here.</p>
       </div>
       <form id="settingsForm" class="px-5 py-4 space-y-4" novalidate>
         <div>
@@ -210,13 +210,6 @@
                  class="w-full h-9 px-3 rounded-md bg-surface-2 border border-line text-[13px] text-slate-100 focus-ring" placeholder="AIza…" />
           <p class="mt-1 text-[12px] text-slate-500">Needs the Map Tiles API enabled. Leave blank to use the default Cesium globe.</p>
           <p class="field-error" data-for="keyGoogle"></p>
-        </div>
-        <div>
-          <label for="keyOpenAI" class="block text-[13px] text-slate-300 mb-1">OpenAI API key</label>
-          <input id="keyOpenAI" type="password" autocomplete="off" spellcheck="false"
-                 class="w-full h-9 px-3 rounded-md bg-surface-2 border border-line text-[13px] text-slate-100 focus-ring" placeholder="sk-…" />
-          <p class="mt-1 text-[12px] text-slate-500">Used for the voice and chat assistant.</p>
-          <p class="field-error" data-for="keyOpenAI"></p>
         </div>
         <div class="flex items-center justify-between pt-2">
           <button type="button" id="btnClearKeys" class="text-[13px] text-slate-500 hover:text-red-300 focus-ring rounded">Remove stored keys</button>
