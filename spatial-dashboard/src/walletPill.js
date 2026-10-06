@@ -21,6 +21,11 @@ function build() {
 }
 
 function mount(wrap) {
+  const slot = document.querySelector("[data-wallet-pill]");
+  if (slot) {
+    slot.replaceChildren(wrap);
+    return true;
+  }
   const sidebar = document.querySelector("#sidebar > div");
   if (sidebar) {
     const row = document.createElement("div");

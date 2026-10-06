@@ -3,144 +3,137 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Geoxis Pricing</title>
-  <link rel="stylesheet" href="/src/styles.css" />
+  <title>Pricing — Geoxis</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          fontFamily: { sans: ["IBM Plex Sans", "system-ui", "sans-serif"] },
+          colors: {
+            surface: { 0: "#0f1117", 1: "#161922", 2: "#1d2130", 3: "#262b3d" },
+            line: { DEFAULT: "#2c3245", strong: "#3b4258" },
+          },
+        },
+      },
+    };
+  </script>
+  <link rel="stylesheet" href="/src/styles.css" />
 </head>
-<body class="min-h-screen bg-surface-0 text-slate-100 p-6">
-  <main class="mx-auto max-w-5xl">
-    <a href="/" class="text-emerald-300 text-sm">← Geoxis globe</a>
-    <h1 class="mt-4 text-3xl font-semibold">Fleet Tracking Pricing</h1>
-    <p class="mt-2 text-sm text-slate-400">Pay with Ixis (100 Ixis = $1). Paid Ixis never expires.</p>
-
-    <div id="loadingState" class="mt-8 text-center text-slate-400">
-      Connecting to Apixis Wallet...
-    </div>
-
-    <div id="pricingGrid" class="mt-8 grid gap-6 md:grid-cols-3 hidden">
-      <!-- Small -->
-      <article class="rounded-lg border border-line bg-surface-1 p-6">
-        <h2 class="text-lg font-medium">Small Fleet</h2>
-        <p class="mt-1 text-xs text-slate-500">Up to 10 assets</p>
-        <div class="mt-4">
-          <div class="text-2xl font-semibold">10,000 Ixis</div>
-          <div class="text-sm text-slate-400">$100/month</div>
-        </div>
-        <button data-product="geoxis.tracking.small" class="redeemBtn mt-6 w-full h-10 rounded-md bg-emerald-500 text-slate-950 font-medium hover:bg-emerald-400">
-          Redeem with Ixis
-        </button>
-      </article>
-
-      <!-- Medium -->
-      <article class="rounded-lg border border-line-strong bg-surface-1 p-6">
-        <div class="text-xs text-emerald-300 uppercase font-medium mb-2">Popular</div>
-        <h2 class="text-lg font-medium">Medium Fleet</h2>
-        <p class="mt-1 text-xs text-slate-500">Up to 50 assets</p>
-        <div class="mt-4">
-          <div class="text-2xl font-semibold">25,000 Ixis</div>
-          <div class="text-sm text-slate-400">$250/month</div>
-        </div>
-        <button data-product="geoxis.tracking.medium" class="redeemBtn mt-6 w-full h-10 rounded-md bg-emerald-500 text-slate-950 font-medium hover:bg-emerald-400">
-          Redeem with Ixis
-        </button>
-      </article>
-
-      <!-- Large -->
-      <article class="rounded-lg border border-line bg-surface-1 p-6">
-        <h2 class="text-lg font-medium">Large Fleet</h2>
-        <p class="mt-1 text-xs text-slate-500">Up to 200 assets</p>
-        <div class="mt-4">
-          <div class="text-2xl font-semibold">45,000 Ixis</div>
-          <div class="text-sm text-slate-400">$450/month</div>
-        </div>
-        <button data-product="geoxis.tracking.large" class="redeemBtn mt-6 w-full h-10 rounded-md bg-emerald-500 text-slate-950 font-medium hover:bg-emerald-400">
-          Redeem with Ixis
-        </button>
-      </article>
-    </div>
-
-    <div class="mt-12 border-t border-line pt-8">
-      <h3 class="text-lg font-medium">One-Time Services</h3>
-      <div class="mt-4 rounded-lg border border-line bg-surface-1 p-4 flex items-center justify-between">
-        <div>
-          <div class="font-medium">Map Export Report</div>
-          <div class="text-xs text-slate-500 mt-1">Generate a downloadable map report with asset positions and analytics</div>
-        </div>
-        <div class="text-right">
-          <div class="font-semibold">1,000 Ixis</div>
-          <div class="text-xs text-slate-400">$10</div>
-          <button data-product="geoxis.export.report" class="redeemBtn mt-2 h-8 px-4 rounded-md bg-emerald-500/15 text-emerald-300 font-medium hover:bg-emerald-500/25">
-            Redeem
-          </button>
-        </div>
+<body class="min-h-screen bg-surface-0 text-slate-200 font-sans antialiased pb-20">
+  <header class="bg-surface-1 border-b border-line">
+    <div class="min-h-14 px-5 py-2 flex flex-wrap items-center gap-3 max-w-6xl mx-auto">
+      <a href="/" class="flex items-center gap-3 leading-tight">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+          <circle cx="11" cy="11" r="9" stroke="#34d399" stroke-width="1.75"/>
+          <path d="M2 11h18M11 2c3 3 3 15 0 18M11 2c-3 3-3 15 0 18" stroke="#34d399" stroke-width="1.25" opacity=".7"/>
+        </svg>
+        <span>
+          <span class="block text-[15px] font-semibold text-slate-100">Geoxis</span>
+          <span class="block text-[11px] text-slate-500">Live operations · Rotterdam</span>
+        </span>
+      </a>
+      <div class="ml-auto flex flex-wrap items-center gap-3">
+        <span data-wallet-pill></span>
+        <nav class="flex items-center gap-3 text-[12px]" aria-label="Account">
+          <a href="/login.html" class="text-slate-400 hover:text-emerald-300">Login</a>
+          <a href="/support.html" class="text-slate-400 hover:text-emerald-300">Support</a>
+          <a href="/admin.html" class="text-slate-400 hover:text-emerald-300">Admin</a>
+        </nav>
       </div>
     </div>
+    <nav aria-label="Family navigation" class="border-t border-line">
+      <div class="px-5 py-2 max-w-6xl mx-auto flex flex-wrap gap-x-4 gap-y-1 text-[12px]">
+        <a href="/" class="text-slate-400 hover:text-emerald-300">Live globe</a>
+        <a href="/companies.html" class="text-emerald-300 hover:text-emerald-100">Apixis Companies →</a>
+        <a href="/feed" class="text-emerald-300 hover:text-emerald-100">Feed →</a>
+        <a href="/pricing" aria-current="page" class="text-slate-100">Pricing</a>
+        <a href="/track" class="text-emerald-300 hover:text-emerald-100">Track a package</a>
+      </div>
+    </nav>
+  </header>
 
-    <div id="status" class="mt-6 text-sm"></div>
+  <main class="max-w-6xl mx-auto px-5 py-8">
+    <p class="text-[11px] uppercase tracking-wider text-emerald-300">Geoxis · Monthly tracking</p>
+    <h1 class="mt-2 text-2xl font-semibold text-slate-100">Follow what is moving</h1>
+    <p class="mt-2 text-sm text-slate-400 max-w-2xl">A thing can be a plane, a ship, a truck, freight, mail, or equipment. You pick how many. Each one is $5 a month. The smallest plan is 3 things ($15 a month).</p>
+
+    <section class="mt-8" aria-labelledby="how-heading">
+      <h2 id="how-heading" class="text-[15px] font-medium text-slate-100">How it works</h2>
+      <ol class="mt-3 space-y-2 text-sm text-slate-300 max-w-2xl list-decimal list-inside">
+        <li>Choose how many things you want on the map.</li>
+        <li>Pay $5 a month for each one. That is 500 Ixis. Three things is the smallest plan.</li>
+        <li>You can pay by card or with Ixis. 100 Ixis = $1. Card checkout is not set up yet, so the button pays with Ixis.</li>
+        <li>Each payment covers 30 days. Pay again to keep those things on the map.</li>
+        <li>Or start a 14-day free trial and follow 1 thing.</li>
+        <li>A map report is $10 once (1,000 Ixis). For 200 or more things, email sales.</li>
+      </ol>
+    </section>
+
+    <div class="mt-8 grid gap-6 lg:grid-cols-3">
+      <article class="lg:col-span-2 rounded-lg border border-line-strong bg-surface-1 p-6">
+        <h2 class="text-lg font-medium text-slate-100">Things to follow</h2>
+        <p class="mt-1 text-[13px] text-slate-400">$5 per thing each month · 500 Ixis · 3 thing minimum</p>
+        <label class="mt-5 block text-[13px] text-slate-300" for="objectCount">How many things?</label>
+        <input id="objectCount" type="number" min="3" max="199" value="3" inputmode="numeric"
+               class="mt-1 w-32 h-10 px-3 rounded-md bg-surface-2 border border-line text-slate-100 focus-ring" />
+        <div class="mt-4">
+          <div id="priceUsd" class="text-2xl font-semibold text-slate-100">$15/month</div>
+          <div id="priceIxis" class="text-sm text-slate-400">1,500 Ixis</div>
+          <p id="priceNote" class="mt-1 text-[13px] text-slate-500">3 things × $5 (500 Ixis each). This covers 30 days.</p>
+        </div>
+        <div id="payBlock">
+          <p class="mt-4 text-[13px] text-slate-400">Pay by card or with Ixis (100 Ixis = $1). Card checkout is not set up yet.</p>
+          <div class="mt-3 flex flex-wrap gap-2">
+            <button id="payObjects" type="button" class="h-10 px-4 rounded-md bg-emerald-500 text-slate-950 text-[13px] font-medium hover:bg-emerald-400 focus-ring">Pay with Ixis · 1,500</button>
+            <button type="button" disabled class="h-10 px-4 rounded-md border border-line text-[13px] text-slate-500 cursor-not-allowed">Pay by card</button>
+          </div>
+          <button id="startTrial" type="button" class="mt-3 h-10 px-4 rounded-md bg-emerald-500/15 text-emerald-300 text-[13px] font-medium hover:bg-emerald-500/25 focus-ring">Start 14-day free trial</button>
+          <p class="mt-2 text-[12px] text-slate-500">The trial follows 1 thing and does not charge you. Sign in with Apixis to start it.</p>
+        </div>
+        <div id="salesBlock" class="hidden mt-4">
+          <p class="text-[13px] text-slate-300">200 or more things are set up by sales. Send a note to awad@apixis.dev.</p>
+        </div>
+      </article>
+
+      <div class="space-y-6">
+        <article class="rounded-lg border border-line bg-surface-1 p-6">
+          <h2 class="text-lg font-medium text-slate-100">Map report</h2>
+          <p class="mt-1 text-[13px] text-slate-400">A one-time report of where things are.</p>
+          <div class="mt-4 text-2xl font-semibold text-slate-100">$10</div>
+          <div class="text-sm text-slate-400">1,000 Ixis</div>
+          <p class="mt-3 text-[13px] text-slate-400">Pay by card or with Ixis. Card checkout is not set up yet.</p>
+          <button id="payReport" type="button" class="mt-3 h-9 px-4 rounded-md bg-emerald-500/15 text-emerald-300 text-[13px] font-medium hover:bg-emerald-500/25 focus-ring">Pay with Ixis · 1,000</button>
+        </article>
+
+        <article class="rounded-lg border border-line bg-surface-1 p-6">
+          <h2 class="text-lg font-medium text-slate-100">200 or more</h2>
+          <p class="mt-1 text-[13px] text-slate-400">Tell us how many things you need. We will write back.</p>
+          <form id="salesForm" class="mt-4 space-y-2">
+            <input id="salesName" required maxlength="80" placeholder="Your name" class="w-full h-9 px-3 rounded-md bg-surface-2 border border-line text-[13px] text-slate-100 placeholder-slate-500 focus-ring" />
+            <input id="salesEmail" type="email" required maxlength="120" placeholder="you@company.com" class="w-full h-9 px-3 rounded-md bg-surface-2 border border-line text-[13px] text-slate-100 placeholder-slate-500 focus-ring" />
+            <input id="salesCount" type="number" min="200" required placeholder="How many things?" class="w-full h-9 px-3 rounded-md bg-surface-2 border border-line text-[13px] text-slate-100 placeholder-slate-500 focus-ring" />
+            <textarea id="salesNote" rows="3" maxlength="1000" placeholder="What do you need to follow?" class="w-full p-3 rounded-md bg-surface-2 border border-line text-[13px] text-slate-100 placeholder-slate-500 focus-ring"></textarea>
+            <button class="h-9 px-4 rounded-md bg-emerald-500 text-slate-950 text-[13px] font-medium hover:bg-emerald-400 focus-ring" type="submit">Email awad@apixis.dev</button>
+          </form>
+        </article>
+      </div>
+    </div>
+    <p id="status" class="mt-4 text-sm text-slate-400" role="status"></p>
   </main>
 
-  <script type="module">
-    import { loadMe, authHeader } from "/src/authClient.js";
+  <footer class="border-t border-line bg-surface-1">
+    <div class="max-w-6xl mx-auto px-5 py-4">
+      <div class="text-[12px] text-slate-500 mb-1">Other Ixis companies</div>
+      <nav data-ixis-companies aria-label="Other Ixis companies" class="flex flex-wrap gap-x-3 gap-y-0 text-[12px]"></nav>
+    </div>
+  </footer>
 
-    const loadingState = document.getElementById("loadingState");
-    const pricingGrid = document.getElementById("pricingGrid");
-    const status = document.getElementById("status");
-
-    let userEmail = null;
-
-    async function init() {
-      const me = await loadMe().catch(() => null);
-      if (!me) {
-        loadingState.textContent = "Sign in to redeem plans.";
-        setTimeout(() => location.href = `/login.html?next=${encodeURIComponent(location.pathname + location.search)}`, 2000);
-        return;
-      }
-      userEmail = me.user.email;
-      loadingState.classList.add("hidden");
-      pricingGrid.classList.remove("hidden");
-    }
-
-    document.querySelectorAll(".redeemBtn").forEach((btn) => {
-      btn.addEventListener("click", async () => {
-        if (!userEmail) {
-          status.textContent = "Please sign in first.";
-          return;
-        }
-        const productKey = btn.dataset.product;
-        const attemptId = crypto.randomUUID(); // Unique per click; retry uses same UUID
-        btn.disabled = true;
-        btn.textContent = "Redeeming...";
-        status.textContent = "";
-
-        try {
-          const res = await fetch("/api/redeem", {
-            method: "POST",
-            // 2026-10-06 (Claude): the session token was never sent, so /api/redeem always answered 401.
-            headers: { "Content-Type": "application/json", ...authHeader() },
-            body: JSON.stringify({ productKey, attemptId }),
-          });
-          const data = await res.json();
-          if (res.status === 402) {
-            // Not enough Ixis
-            status.textContent = data.message || "Not enough Ixis. Buy Ixis in Apixis Wallet.";
-            status.innerHTML += ` <a href="https://apixis-wallet.vercel.app/buy?product=geoxis&return_url=${encodeURIComponent(location.href)}" class="text-emerald-300 underline">Buy Ixis</a>`;
-          } else if (!res.ok) {
-            status.textContent = data.message || data.error || "Redemption failed.";
-          } else {
-            status.textContent = "✓ Plan activated! Returning to globe...";
-            setTimeout(() => location.href = "/", 2000);
-          }
-        } catch (err) {
-          status.textContent = "Network error: " + err.message;
-        } finally {
-          btn.disabled = false;
-          btn.textContent = "Redeem with Ixis";
-        }
-      });
-    });
-
-    init();
-  </script>
+  <script type="module" src="/src/pricingPage.js"></script>
+  <script type="module" src="/src/walletPill.js"></script>
+  <script type="module" src="/src/ixisCompanies.js"></script>
 </body>
 </html>
