@@ -104,3 +104,6 @@ Entry format:
 - Not changed: geoxis.vercel.app was not moved. Vercel refused to add it to `spatial-dashboard` (409 `owned-on-other-team`: "Cannot add geoxis.vercel.app since it's already assigned to another project."), and no project or alias in team `313aidaroos-projects` holds it. Because the domain did not move, the Wallet `geoxis` client callback list and `APP_URL` were left as they are.
 - Why: Awad's Geoxis cleanup (three tasks). Undo: `git revert 551eaf8` (restores the deleted files); `git revert 0a87c78` (removes Claude's notes entries); `git revert` this notes PR's squash commit.
 
+## 2026-10-06 — Claude (family lead): AI Receptionist notes (D18)
+- Changed: AI Receptionist section in the family notes (see `docs/AI_RECEPTIONIST.md` in ApixisWallet); notes only, no code.
+- Why: Awad approved an AI Receptionist add-on at $100/month for every customer-facing family site and asked every bot and agent to follow one plan.
