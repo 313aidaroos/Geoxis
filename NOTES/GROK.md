@@ -310,3 +310,6 @@ Recorded by Grok (Developer Bot, notes and status sync at 12:25 AM CT on Oct 5).
 - Pages use the current globe header (Special Elite, emerald buttons, surface colors) and the Other Ixis companies footer. Cixy help and a short How it works section are on pricing and the tracker.
 - Where: `spatial-dashboard/pricing.html`, `track.html`, `api/redeem.js`, `api/track.js`, `api/positions.js`, `lib/pricing.js`, `lib/carriers.js`, `lib/tracking.js`, `lib/packageKey.js`, `lib/ship24.js`, `lib/geocode.js`, `sql/005_object_limit_packages.sql`, tests under `spatial-dashboard/test/`.
 - Undo: revert this branch. Remove `SHIP24_API_KEY` if it was added in Vercel. The two new Wallet SKUs can stay; they are not charged until Geoxis redeems them.
+## 2026-10-06 — Pricing locked
+- Prices for Geoxis were locked by Awad. See NOTES/PRICING.md.
+- The site/code still needs updating to match NOTES/PRICING.md where it does not.
