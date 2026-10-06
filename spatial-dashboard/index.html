@@ -8,21 +8,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet" />
 
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: "class",
-      theme: {
-        extend: {
-          fontFamily: { sans: ["IBM Plex Sans", "system-ui", "sans-serif"] },
-          colors: {
-            surface: { 0: "#0f1117", 1: "#161922", 2: "#1d2130", 3: "#262b3d" },
-            line: { DEFAULT: "#2c3245", strong: "#3b4258" },
-          },
-        },
-      },
-    };
-  </script>
   <link rel="stylesheet" href="/src/styles.css" />
 </head>
 
@@ -42,7 +27,7 @@
         </svg>
         <div class="leading-tight">
           <div class="text-[15px] font-semibold text-slate-100">Geoxis</div>
-          <div class="text-[11px] text-slate-500">Live operations · Rotterdam</div>
+          <div class="text-[11px] text-slate-500"><span id="feedMode">Demo fleet · Rotterdam</span></div>
         </div>
         <nav class="ml-auto flex items-center gap-2 text-[12px]">
           <a href="/login.html" class="text-slate-400 hover:text-emerald-300">Login</a>
@@ -54,6 +39,8 @@
         </button>
       </div>
       <nav aria-label="Family navigation" class="px-5 py-2 border-b border-line"><a href="/companies.html" class="text-[12px] text-emerald-300 hover:text-emerald-100">Apixis Companies →</a><a href="/feed" class="ml-4 text-[12px] text-emerald-300 hover:text-emerald-100">Feed →</a></nav>
+
+      <p id="sourceStatus" class="px-4 pt-2 text-[12px] text-amber-200" role="status">Sample fleet positions are simulated. Connecting to data sources…</p>
 
       <!-- Search -->
       <div class="px-4 pt-4 pb-3">
@@ -77,7 +64,7 @@
             <input type="checkbox" class="toggle" data-layer="weather" />
           </label>
           <label class="toggle-row" data-layer="risk">
-            <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-amber-400"></span>Risk zones</span>
+            <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-amber-400"></span>Demo risk zones</span>
             <input type="checkbox" class="toggle" data-layer="risk" checked />
           </label>
           <label class="toggle-row" data-layer="trails">
@@ -90,7 +77,7 @@
       <!-- Asset list -->
       <div class="flex-1 min-h-0 flex flex-col">
         <div class="px-4 pt-3 pb-2 flex items-center justify-between">
-          <div class="text-[12px] text-slate-500">Live assets</div>
+          <div class="text-[12px] text-slate-500">Tracked assets</div>
           <div class="text-[12px] text-slate-500"><span id="assetCount">—</span> tracked</div>
         </div>
         <ul id="assetList" class="flex-1 overflow-y-auto px-2 pb-3 space-y-1" role="list" aria-live="polite"></ul>
@@ -178,7 +165,7 @@
 
         <div id="chatLog" class="flex-1 min-h-0 overflow-y-auto px-4 py-3 space-y-3 text-[13px]" role="log" aria-live="polite">
           <div class="msg msg-assistant">
-            Ask Cixy about live assets, geofences, ETAs, and operational risk. Cixy uses the live Geoxis feed and never invents missing data.
+            Ask Cixy about tracked assets and operational risk. The public fleet is simulated; aircraft are live only when OpenSky is available.
           </div>
         </div>
 
@@ -201,7 +188,7 @@
     <div class="w-[440px] rounded-lg bg-surface-1 border border-line shadow-2xl">
       <div class="px-5 py-4 border-b border-line">
         <h2 id="settingsTitle" class="text-[15px] font-medium text-slate-100">Connect your services</h2>
-        <p class="mt-1 text-[12px] text-slate-500">Keys are stored only in this browser's local storage and sent directly to each provider.</p>
+        <p class="mt-1 text-[12px] text-slate-500">The optional map key is stored in this browser and sent to Google Maps. Cixy is managed by Geoxis.</p>
       </div>
       <form id="settingsForm" class="px-5 py-4 space-y-4" novalidate>
         <div>
@@ -210,13 +197,6 @@
                  class="w-full h-9 px-3 rounded-md bg-surface-2 border border-line text-[13px] text-slate-100 focus-ring" placeholder="AIza…" />
           <p class="mt-1 text-[12px] text-slate-500">Needs the Map Tiles API enabled. Leave blank to use the default Cesium globe.</p>
           <p class="field-error" data-for="keyGoogle"></p>
-        </div>
-        <div>
-          <label for="keyOpenAI" class="block text-[13px] text-slate-300 mb-1">OpenAI API key</label>
-          <input id="keyOpenAI" type="password" autocomplete="off" spellcheck="false"
-                 class="w-full h-9 px-3 rounded-md bg-surface-2 border border-line text-[13px] text-slate-100 focus-ring" placeholder="sk-…" />
-          <p class="mt-1 text-[12px] text-slate-500">Used for the voice and chat assistant.</p>
-          <p class="field-error" data-for="keyOpenAI"></p>
         </div>
         <div class="flex items-center justify-between pt-2">
           <button type="button" id="btnClearKeys" class="text-[13px] text-slate-500 hover:text-red-300 focus-ring rounded">Remove stored keys</button>
@@ -232,33 +212,6 @@
   <!-- Toasts -->
   <div id="toasts" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 space-y-2 pointer-events-none"></div>
 
-  <script>
-    (function seedAssetCounter() {
-      function paint(n, alarms) {
-        var total = document.getElementById("mTotalAssets");
-        var count = document.getElementById("assetCount");
-        if (total) total.textContent = String(n);
-        if (count) count.textContent = String(n);
-        var empty = document.getElementById("assetListEmpty");
-        if (empty && n) empty.classList.add("hidden");
-        var feed = document.getElementById("feedStatus");
-        if (feed) feed.textContent = "Feed connected";
-        var dot = document.getElementById("feedDot");
-        if (dot) dot.className = "w-2 h-2 rounded-full bg-emerald-400";
-        var alarmEl = document.getElementById("mAlarms");
-        if (alarmEl && typeof alarms === "number") alarmEl.textContent = String(alarms);
-      }
-      fetch("/api/assets", { cache: "no-store" })
-        .then(function (res) { return res.json(); })
-        .then(function (data) {
-          var assets = Array.isArray(data.assets) ? data.assets : [];
-          var alarms = 0;
-          for (var i = 0; i < assets.length; i++) if (assets[i] && assets[i].alarm) alarms += 1;
-          paint(assets.length, alarms);
-        })
-        .catch(function () {});
-    })();
-  </script>
   <script type="module" src="/src/main.js"></script>
   <script type="module" src="/src/walletPill.js"></script>
   <script type="module" src="/src/ixisCompanies.js"></script>

@@ -6,7 +6,6 @@
   <title>Geoxis Login</title>
   <link rel="stylesheet" href="/src/styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet" />
-  <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="min-h-screen bg-surface-0 text-slate-100 flex items-center justify-center p-6">
   <main class="w-full max-w-md rounded-2xl border border-line bg-surface-1 p-6 shadow-2xl">
@@ -45,7 +44,7 @@
     </footer>
   </main>
   <script type="module">
-    import { consumeAuthHash, requestMagicLink, clearSession } from "/src/authClient.js";
+    import { consumeAuthHash, requestMagicLink, safeNextPath } from "/src/authClient.js";
 
     const tabMagic = document.getElementById("tabMagic");
     const tabPassword = document.getElementById("tabPassword");
@@ -56,7 +55,7 @@
     // Parse next parameter
     const params = new URLSearchParams(location.search);
     const next = params.get("next");
-    const safeNext = next && next.startsWith("/") && !next.startsWith("//") ? next : "/";
+    const safeNext = safeNextPath(next);
 
     // Tab switching
     tabMagic.onclick = () => {

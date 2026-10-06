@@ -83,9 +83,10 @@ export class GeospatialMap {
       shouldAnimate: true,
       requestRenderMode: false,
       terrain: undefined,
-      imageryProvider: await Cesium.ArcGisMapServerImageryProvider.fromUrl(
-        "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer"
-      ),
+      // Start with bundled imagery so an external outage cannot leave a blank globe.
+      baseLayer: new Cesium.ImageryLayer(await Cesium.TileMapServiceImageryProvider.fromUrl(
+        Cesium.buildModuleUrl("Assets/Textures/NaturalEarthII"),
+      )),
     });
 
     const scene = this.viewer.scene;
@@ -104,6 +105,7 @@ export class GeospatialMap {
     this.#installPicking();
     this.#buildRiskZones();
     this.setInitialCamera(false);
+    this.#loadSatelliteImagery();
 
     await this.setGoogleTiles(googleMapsKey);
     this.#setStatus(this.#describeCamera());
@@ -123,6 +125,25 @@ export class GeospatialMap {
     this.#clickHandler?.destroy();
     this.viewer?.destroy();
     this.viewer = null;
+  }
+
+  async #loadSatelliteImagery() {
+    try {
+      const provider = await Cesium.ArcGisMapServerImageryProvider.fromUrl(
+        "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer",
+      );
+      if (!this.viewer || this.viewer.isDestroyed()) return;
+      const layer = this.viewer.imageryLayers.addImageryProvider(provider, 1);
+      let failed = false;
+      provider.errorEvent.addEventListener(() => {
+        if (failed) return;
+        failed = true;
+        layer.show = false;
+        this.bus.emit("map:basemapFallback");
+      });
+    } catch {
+      this.bus.emit("map:basemapFallback");
+    }
   }
 
   /* ---------------------------------------------------------------- */

@@ -6,19 +6,18 @@
   <title>Geoxis Pricing</title>
   <link rel="stylesheet" href="/src/styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet" />
-  <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="min-h-screen bg-surface-0 text-slate-100 p-6">
   <main class="mx-auto max-w-5xl">
     <a href="/" class="text-emerald-300 text-sm">← Geoxis globe</a>
-    <h1 class="mt-4 text-3xl font-semibold">Fleet Tracking Pricing</h1>
+    <h1 class="mt-4 text-3xl font-semibold">Planned Fleet Tracking Pricing</h1>
     <p class="mt-2 text-sm text-slate-400">Pay with Ixis (100 Ixis = $1). Paid Ixis never expires.</p>
 
     <div id="loadingState" class="mt-8 text-center text-slate-400">
-      Connecting to Apixis Wallet...
+      Plans and reports are not on sale yet. The public demo is free to explore.
     </div>
 
-    <div id="pricingGrid" class="mt-8 grid gap-6 md:grid-cols-3 hidden">
+    <div id="pricingGrid" class="mt-8 grid gap-6 md:grid-cols-3">
       <!-- Small -->
       <article class="rounded-lg border border-line bg-surface-1 p-6">
         <h2 class="text-lg font-medium">Small Fleet</h2>
@@ -27,8 +26,8 @@
           <div class="text-2xl font-semibold">10,000 Ixis</div>
           <div class="text-sm text-slate-400">$100/month</div>
         </div>
-        <button data-product="geoxis.tracking.small" class="redeemBtn mt-6 w-full h-10 rounded-md bg-emerald-500 text-slate-950 font-medium hover:bg-emerald-400">
-          Redeem with Ixis
+        <button disabled aria-disabled="true" data-product="geoxis.tracking.small" class="redeemBtn mt-6 w-full h-10 rounded-md bg-emerald-500 text-slate-950 font-medium hover:bg-emerald-400">
+          Coming soon
         </button>
       </article>
 
@@ -41,8 +40,8 @@
           <div class="text-2xl font-semibold">25,000 Ixis</div>
           <div class="text-sm text-slate-400">$250/month</div>
         </div>
-        <button data-product="geoxis.tracking.medium" class="redeemBtn mt-6 w-full h-10 rounded-md bg-emerald-500 text-slate-950 font-medium hover:bg-emerald-400">
-          Redeem with Ixis
+        <button disabled aria-disabled="true" data-product="geoxis.tracking.medium" class="redeemBtn mt-6 w-full h-10 rounded-md bg-emerald-500 text-slate-950 font-medium hover:bg-emerald-400">
+          Coming soon
         </button>
       </article>
 
@@ -54,8 +53,8 @@
           <div class="text-2xl font-semibold">45,000 Ixis</div>
           <div class="text-sm text-slate-400">$450/month</div>
         </div>
-        <button data-product="geoxis.tracking.large" class="redeemBtn mt-6 w-full h-10 rounded-md bg-emerald-500 text-slate-950 font-medium hover:bg-emerald-400">
-          Redeem with Ixis
+        <button disabled aria-disabled="true" data-product="geoxis.tracking.large" class="redeemBtn mt-6 w-full h-10 rounded-md bg-emerald-500 text-slate-950 font-medium hover:bg-emerald-400">
+          Coming soon
         </button>
       </article>
     </div>
@@ -70,8 +69,8 @@
         <div class="text-right">
           <div class="font-semibold">1,000 Ixis</div>
           <div class="text-xs text-slate-400">$10</div>
-          <button data-product="geoxis.export.report" class="redeemBtn mt-2 h-8 px-4 rounded-md bg-emerald-500/15 text-emerald-300 font-medium hover:bg-emerald-500/25">
-            Redeem
+          <button disabled aria-disabled="true" data-product="geoxis.export.report" class="redeemBtn mt-2 h-8 px-4 rounded-md bg-emerald-500/15 text-emerald-300 font-medium hover:bg-emerald-500/25">
+            Coming soon
           </button>
         </div>
       </div>
@@ -80,66 +79,6 @@
     <div id="status" class="mt-6 text-sm"></div>
   </main>
 
-  <script type="module">
-    import { loadMe } from "/src/authClient.js";
 
-    const loadingState = document.getElementById("loadingState");
-    const pricingGrid = document.getElementById("pricingGrid");
-    const status = document.getElementById("status");
-
-    let userEmail = null;
-
-    async function init() {
-      const me = await loadMe().catch(() => null);
-      if (!me) {
-        loadingState.textContent = "Sign in to redeem plans.";
-        setTimeout(() => location.href = `/login.html?next=${encodeURIComponent(location.pathname + location.search)}`, 2000);
-        return;
-      }
-      userEmail = me.user.email;
-      loadingState.classList.add("hidden");
-      pricingGrid.classList.remove("hidden");
-    }
-
-    document.querySelectorAll(".redeemBtn").forEach((btn) => {
-      btn.addEventListener("click", async () => {
-        if (!userEmail) {
-          status.textContent = "Please sign in first.";
-          return;
-        }
-        const productKey = btn.dataset.product;
-        const attemptId = crypto.randomUUID(); // Unique per click; retry uses same UUID
-        btn.disabled = true;
-        btn.textContent = "Redeeming...";
-        status.textContent = "";
-
-        try {
-          const res = await fetch("/api/redeem", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ productKey, attemptId }),
-          });
-          const data = await res.json();
-          if (res.status === 402) {
-            // Not enough Ixis
-            status.textContent = data.message || "Not enough Ixis. Buy Ixis in Apixis Wallet.";
-            status.innerHTML += ` <a href="https://apixis-wallet.vercel.app/buy?product=geoxis&return_url=${encodeURIComponent(location.href)}" class="text-emerald-300 underline">Buy Ixis</a>`;
-          } else if (!res.ok) {
-            status.textContent = data.message || data.error || "Redemption failed.";
-          } else {
-            status.textContent = "✓ Plan activated! Returning to globe...";
-            setTimeout(() => location.href = "/", 2000);
-          }
-        } catch (err) {
-          status.textContent = "Network error: " + err.message;
-        } finally {
-          btn.disabled = false;
-          btn.textContent = "Redeem with Ixis";
-        }
-      });
-    });
-
-    init();
-  </script>
 </body>
 </html>

@@ -1,13 +1,16 @@
 # Geoxis
 
-A live map of everything a company has moving in the real world, on a 3D globe.
+A 3D operations dashboard for company assets, built with Vite, vanilla JavaScript, Cesium, and Vercel functions.
 
-App lives in `spatial-dashboard/`. The globe polls `GET /api/assets` — company fleet positions from the server clock, plus live ADS-B over Rotterdam from OpenSky when that network answers.
+The active application is in `spatial-dashboard/`. The public demo has six **simulated** fleet assets around Rotterdam and optional live OpenSky aircraft. Signed-in users request their own tenant’s recorded positions from Supabase. Cixy uses a server-side Anthropic credential.
 
 ```bash
 cd spatial-dashboard
-npm install
+npm ci
 npm run dev
+npm run check
 ```
 
-No keys required for the default globe and the live feed. Google Map Tiles and OpenAI are optional (settings gear).
+The default map needs no API key. Google photorealistic tiles are optional. See [`spatial-dashboard/README.md`](spatial-dashboard/README.md) for configuration and current limits.
+
+Root-level HTML/JavaScript and `README-2.md` are historical Meridian prototype files; they are not deployed. The Vercel project root must be `spatial-dashboard`.

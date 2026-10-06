@@ -1,3 +1,5 @@
+> Historical Meridian prototype documentation. For the deployed app, use `spatial-dashboard/README.md`. The OpenAI browser-key assistant described below is not used by Geoxis.
+
 # Meridian — Spatial Intelligence Dashboard (boilerplate)
 
 Framework-free B2B geospatial dashboard: Vanilla JS + Vite + Tailwind + CesiumJS,
