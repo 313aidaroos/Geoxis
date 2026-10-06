@@ -26,7 +26,7 @@ export class SpatialAIAgent {
 
   sendText(text) {
     const clean = String(text || "").trim();
-    if (!clean) return false;
+    if (!clean || this.status === "streaming") return false;
     this.connect();
     this.bus.emit("ai:message", { role: "user", text: clean });
     this.history.push({ role: "user", content: clean });
@@ -44,7 +44,7 @@ export class SpatialAIAgent {
       });
       const data = await res.json().catch(() => ({}));
       if (res.status === 503) {
-        this.#assistant("Cixy is not connected yet. ANTHROPIC_API_KEY is missing on the server, so I will not fake an answer.");
+        this.#assistant("Cixy is unavailable right now. Please try again later.");
         return;
       }
       if (!res.ok) {

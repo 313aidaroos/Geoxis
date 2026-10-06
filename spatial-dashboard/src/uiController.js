@@ -72,6 +72,20 @@ export class UIController {
       if (typeof messagesPerSecond === "number") $("feedRate").textContent = `${messagesPerSecond} msg/s`;
     });
 
+    this.bus.on("map:basemapFallback", () => {
+      this.toast("Satellite imagery is unavailable. Showing the overview map.");
+    });
+
+    this.bus.on("stream:snapshot", ({ sources, tenant, assets }) => {
+      const demo = !tenant;
+      $("feedMode").textContent = demo ? "Demo fleet · Rotterdam" : `${tenant.name || "Your company"} · Fleet`;
+      $("sourceStatus").textContent = demo
+        ? `Simulated fleet. ${sources?.air === "opensky" ? "Live aircraft: OpenSky." : sources?.air === "opensky-stale" ? "Aircraft data is stale." : "Live aircraft unavailable."}`
+        : "Your company’s recorded asset positions.";
+      $("assetListEmpty").textContent = demo ? "No assets available." : "No assets connected to your company yet.";
+      $("assetListEmpty").classList.toggle("hidden", assets.length > 0);
+    });
+
     this.bus.on("map:layerError", ({ name }) => {
       this.toast(`The ${name} layer couldn't be loaded right now.`, "error");
       this.state.setLayer(name, false);
@@ -105,9 +119,10 @@ export class UIController {
       const select = () => {
         const prev = this.state.selectedAssetId;
         this.state.selectAsset(a.id);
-        if (prev) this.engine.map.refreshAssetStyle(prev);
-        this.engine.map.refreshAssetStyle(a.id);
-        this.engine.map.flyToAsset(a.latitude, a.longitude, 3000);
+        if (prev) this.engine.map?.refreshAssetStyle(prev);
+        this.engine.map?.refreshAssetStyle(a.id);
+        const latest = this.state.assets.get(a.id);
+        if (latest) this.engine.map?.flyToAsset(latest.latitude, latest.longitude, 3000);
       };
       li.addEventListener("click", select);
       li.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); select(); } });
@@ -149,6 +164,7 @@ export class UIController {
 
   #updateCount() {
     $("assetCount").textContent = String(this.state.assets.size);
+    $("assetListEmpty").classList.toggle("hidden", this.state.assets.size > 0);
   }
 
   /* ---------------------------------------------------------------- */
@@ -187,8 +203,8 @@ export class UIController {
     $("btnCloseSelected").addEventListener("click", () => {
       const prev = this.state.selectedAssetId;
       this.state.selectAsset(null);
-      this.engine.map.trackAsset(null);
-      if (prev) this.engine.map.refreshAssetStyle(prev);
+      this.engine.map?.trackAsset(null);
+      if (prev) this.engine.map?.refreshAssetStyle(prev);
     });
 
     $("btnFollow").addEventListener("click", () => {
@@ -196,7 +212,7 @@ export class UIController {
       if (!id) return;
       const following = this.state.followingAssetId === id;
       this.state.setFollowing(following ? null : id);
-      this.engine.map.trackAsset(following ? null : id);
+      this.engine.map?.trackAsset(following ? null : id);
       $("btnFollow").textContent = following ? "Follow asset" : "Stop following";
     });
     this.bus.on("asset:following", (id) => {
@@ -217,11 +233,19 @@ export class UIController {
       ["Cargo", a.cargo],
       ["Distance run", `${a.odometerKm} km`],
       ["Status", a.alarm ? a.alarmReason : "Nominal"],
+      ["Source", a.simulated || a.source === "geoxis-fleet" ? "Simulated demo" : a.stale ? "OpenSky · stale" : a.source || "Unknown"],
       ["Last fix", new Date(a.timestamp).toLocaleTimeString()],
     ];
-    $("selMeta").innerHTML = rows
-      .map(([k, v]) => `<dt class="text-slate-500">${k}</dt><dd class="text-slate-200 text-right tabular ${k === "Status" && a.alarm ? "text-amber-300" : ""}">${v}</dd>`)
-      .join("");
+    $("selMeta").replaceChildren(...rows.flatMap(([key, value]) => {
+      const label = document.createElement("dt");
+      label.className = "text-slate-500";
+      label.textContent = key;
+      const detail = document.createElement("dd");
+      detail.className = "text-slate-200 text-right tabular";
+      if (key === "Status" && a.alarm) detail.classList.add("text-amber-300");
+      detail.textContent = String(value ?? "—");
+      return [label, detail];
+    }));
   }
 
   /* ---------------------------------------------------------------- */
@@ -329,14 +353,11 @@ export class UIController {
     const modal = $("settingsModal");
     const form = $("settingsForm");
     const gInput = $("keyGoogle");
-    const oInput = $("keyOpenAI");
 
     const open = () => {
       const s = this.settings.getAll();
       gInput.value = s.googleMapsKey;
-      oInput.value = s.openaiKey;
       gInput.placeholder = s.googleMapsKey ? SettingsManager.mask(s.googleMapsKey) : "AIza…";
-      oInput.placeholder = s.openaiKey ? SettingsManager.mask(s.openaiKey) : "sk-…";
       this.#clearFieldErrors();
       modal.classList.remove("hidden");
       gInput.focus();
@@ -351,7 +372,7 @@ export class UIController {
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       this.#clearFieldErrors();
-      const result = this.settings.saveKeys({ googleMapsKey: gInput.value, openaiKey: oInput.value });
+      const result = this.settings.saveKeys({ googleMapsKey: gInput.value });
       if (!result.ok) {
         for (const [field, message] of Object.entries(result.errors)) {
           const inputId = field === "googleMapsKey" ? "keyGoogle" : "keyOpenAI";
@@ -370,7 +391,6 @@ export class UIController {
     $("btnClearKeys").addEventListener("click", async () => {
       this.settings.clearKeys();
       gInput.value = "";
-      oInput.value = "";
       close();
       this.toast("Stored keys removed.");
       await this.engine.applySettings();

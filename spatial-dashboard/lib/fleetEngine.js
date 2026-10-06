@@ -185,6 +185,7 @@ function fleetFrames(nowMs) {
       alarm: Boolean(zone),
       alarmReason: zone ? `Inside risk zone: ${zone}` : null,
       source: "geoxis-fleet",
+      simulated: true,
       timestamp: new Date(nowMs).toISOString(),
     };
   });
@@ -241,7 +242,7 @@ async function fetchOpenSky(nowMs) {
         alarm: false,
         alarmReason: null,
         source: "opensky",
-        timestamp: new Date(nowMs).toISOString(),
+        timestamp: new Date(Number.isFinite(s[3]) ? s[3] * 1000 : nowMs).toISOString(),
       });
       if (assets.length >= 20) break;
     }
@@ -262,9 +263,11 @@ export async function snapshot() {
     sentAt,
     origin: ORIGIN,
     sources: {
-      fleet: "geoxis",
+      fleet: "simulated",
       air: air.ok ? "opensky" : air.assets.length ? "opensky-stale" : "none",
     },
-    assets: [...fleet, ...air.assets],
+    assets: [...fleet, ...air.assets
+      .filter((asset) => sentAt - Date.parse(asset.timestamp) < 5 * 60_000)
+      .map((asset) => ({ ...asset, stale: !air.ok || sentAt - Date.parse(asset.timestamp) > 60_000 }))],
   };
 }

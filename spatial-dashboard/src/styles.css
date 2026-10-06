@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* Enterprise theme supplements. Tailwind handles layout; this file owns
    component states, the Cesium widget overrides, and motion. */
 
@@ -37,6 +41,7 @@ body, * {
   display: grid; grid-template-columns: 10px 1fr auto; column-gap: 10px; align-items: center;
   padding: 8px 10px; border-radius: 6px; cursor: pointer; border: 1px solid transparent;
 }
+.asset-row.hidden { display: none; }
 .asset-row:hover { background: #1d2130; }
 .asset-row[aria-selected="true"] { background: #1d2130; border-color: #2c3245; }
 .asset-row .name { font-size: 13px; color: #f1f5f9; font-weight: 500; }
@@ -92,13 +97,35 @@ input.invalid { border-color: #ef4444; }
 .toast-error { border-color: #ef444488; }
 
 /* --- Cesium overrides: strip the default widget chrome --- */
-#cesiumContainer .cesium-viewer-bottom,
 #cesiumContainer .cesium-viewer-toolbar,
 #cesiumContainer .cesium-viewer-animationContainer,
 #cesiumContainer .cesium-viewer-timelineContainer { display: none !important; }
-#cesiumContainer .cesium-widget-credits { display: none !important; }
+#cesiumContainer .cesium-viewer-bottom { bottom: 64px; }
 
 @media (prefers-reduced-motion: reduce) {
   .ai-panel, .toggle, .toggle::after { transition: none; }
   .pulse span { animation: none !important; }
+}
+
+/* Keep map controls and account navigation reachable on narrow screens. */
+#sidebar > div:first-child { height: auto; min-height: 56px; flex-wrap: wrap; padding-top: 8px; padding-bottom: 8px; }
+#mapStatus { max-width: calc(100% - 130px); }
+#aiPanel { width: min(380px, calc(100% - 2rem)); }
+#selectedCard { max-width: calc(100% - 2rem); }
+#settingsModal > div { max-width: calc(100vw - 2rem); }
+@media (max-width: 760px) {
+  #app { flex-direction: column; }
+  #sidebar { width: 100%; height: 50dvh; min-height: 0; overflow-y: auto; }
+  #sidebar > * { flex-shrink: 0; }
+  #sidebar > .flex-1 { min-height: 100px; }
+  #sidebar > nav { padding-top: 2px; padding-bottom: 2px; }
+  #sidebar > .pt-4 { padding-top: 8px; padding-bottom: 8px; }
+  #sidebar footer { display: none; }
+  #app > main { min-height: 0; }
+  #metricsBar { width: calc(100% - 2rem); }
+  .metric { min-width: 0; flex: 1; padding: 8px; }
+  .metric-label { font-size: 10px; }
+  .metric-value { font-size: 18px; }
+  #layerToggles { display: grid; grid-template-columns: 1fr 1fr; }
+  .toggle-row { font-size: 11px; gap: 8px; }
 }

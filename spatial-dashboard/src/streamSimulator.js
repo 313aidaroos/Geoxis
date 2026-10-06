@@ -13,6 +13,8 @@
  * course.
  */
 
+import { authHeader } from "./authClient.js";
+
 const EARTH_RADIUS_M = 6_371_000;
 const toRad = (d) => (d * Math.PI) / 180;
 const toDeg = (r) => (r * 180) / Math.PI;
@@ -308,13 +310,14 @@ export class HttpTelemetryPoller {
   static CLOSING = 2;
   static CLOSED = 3;
 
-  constructor({ url, intervalMs }) {
+  constructor({ url, intervalMs, getHeaders = () => ({}) }) {
     this.readyState = HttpTelemetryPoller.CONNECTING;
     this.onopen = null;
     this.onmessage = null;
     this.onclose = null;
     this.onerror = null;
     this.#url = url;
+    this.#getHeaders = getHeaders;
     this.#intervalMs = intervalMs;
     this.#timer = setTimeout(() => this.#open(), 40);
   }
@@ -325,24 +328,33 @@ export class HttpTelemetryPoller {
   #closed = false;
   #inflight = false;
   #failures = 0;
+  #getHeaders;
+  #controller;
 
   async #open() {
     if (this.#closed) return;
-    this.readyState = HttpTelemetryPoller.OPEN;
-    this.onopen?.({ type: "open" });
     await this.#tick();
     if (!this.#closed) this.#timer = setInterval(() => this.#tick(), this.#intervalMs);
   }
 
   async #tick() {
-    if (this.readyState !== HttpTelemetryPoller.OPEN || this.#inflight) return;
+    if (this.#closed || this.#inflight) return;
     this.#inflight = true;
+    this.#controller = new AbortController();
+    const timeout = setTimeout(() => this.#controller?.abort(), 10_000);
     try {
-      const res = await fetch(this.#url, { cache: "no-store" });
+      const res = await fetch(this.#url, { cache: "no-store", headers: this.#getHeaders(), signal: this.#controller.signal });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
+      if (this.#closed) return;
+      if (!Array.isArray(json.assets)) throw new Error("Invalid asset snapshot");
+      if (this.readyState !== HttpTelemetryPoller.OPEN || this.#failures) {
+        this.readyState = HttpTelemetryPoller.OPEN;
+        this.onopen?.({ type: "open" });
+      }
       const sentAt = typeof json.sentAt === "number" ? json.sentAt : Date.now();
       const assets = Array.isArray(json.assets) ? json.assets : [];
+      this.onmessage?.({ data: JSON.stringify({ channel: "snapshot", payload: json }) });
       for (const frame of assets) {
         this.onmessage?.({
           data: JSON.stringify({ channel: "telemetry", sentAt, payload: frame }),
@@ -351,8 +363,9 @@ export class HttpTelemetryPoller {
       this.#failures = 0;
     } catch (err) {
       this.#failures += 1;
-      if (this.#failures >= 3) this.onerror?.(err);
+      if (!this.#closed) this.onerror?.(err);
     } finally {
+      clearTimeout(timeout);
       this.#inflight = false;
     }
   }
@@ -360,6 +373,7 @@ export class HttpTelemetryPoller {
   close(code = 1000, reason = "client closed") {
     if (this.readyState === HttpTelemetryPoller.CLOSED) return;
     this.#closed = true;
+    this.#controller?.abort();
     this.readyState = HttpTelemetryPoller.CLOSING;
     clearTimeout(this.#timer);
     clearInterval(this.#timer);
@@ -415,7 +429,7 @@ export class AssetDataStreamer {
     if (endpoint && (endpoint.startsWith("ws://") || endpoint.startsWith("wss://"))) {
       this.socket = new WebSocket(endpoint);
     } else if (endpoint) {
-      this.socket = new HttpTelemetryPoller({ url: endpoint, intervalMs: this.intervalMs });
+      this.socket = new HttpTelemetryPoller({ url: endpoint, intervalMs: this.intervalMs, getHeaders: endpoint === "/api/assets" ? authHeader : () => ({}) });
     } else {
       const fleet = buildFleet(this.origin, this.radiusKm, this.targetCount);
       this.socket = new MockTransponderSocket({
@@ -459,6 +473,10 @@ export class AssetDataStreamer {
       msg = JSON.parse(evt.data);
     } catch (err) {
       console.warn("[stream] dropped malformed frame", err);
+      return;
+    }
+    if (msg?.channel === "snapshot" && Array.isArray(msg.payload?.assets)) {
+      this.bus.emit("stream:snapshot", { ...msg.payload, assets: msg.payload.assets.filter((frame) => this.#isValidFrame(frame)) });
       return;
     }
     if (msg?.channel !== "telemetry" || !this.#isValidFrame(msg.payload)) {

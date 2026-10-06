@@ -56,13 +56,6 @@ const KEY_RULES = {
     validate: (v) => /^AIza[0-9A-Za-z_-]{35}$/.test(v),
     hint: "Google keys start with AIza and are 39 characters long.",
   },
-  openaiKey: {
-    label: "OpenAI API key",
-    optional: true,
-    // Accept classic sk-… and project keys sk-proj-…; only shape is checked.
-    validate: (v) => /^sk-[A-Za-z0-9_-]{20,}$/.test(v),
-    hint: "OpenAI keys start with sk- followed by at least 20 characters.",
-  },
 };
 
 export class SettingsManager {
@@ -70,6 +63,8 @@ export class SettingsManager {
 
   constructor(namespace = STORAGE_NS) {
     this.namespace = namespace;
+    // The active Cixy assistant uses a server credential; remove the obsolete browser key.
+    this.#write("openaiKey", null);
   }
 
   #storageKey(name) {
@@ -105,9 +100,7 @@ export class SettingsManager {
     if (!this.#cache) {
       this.#cache = {
         googleMapsKey: this.#read("googleMapsKey", ""),
-        openaiKey: this.#read("openaiKey", ""),
         layers: this.#read("layers", { fleet: true, weather: false, risk: true, trails: true }),
-        aiModel: this.#read("aiModel", "gpt-realtime"),
       };
     }
     return { ...this.#cache };
@@ -326,13 +319,11 @@ export class B2BSaasEngine {
     }
     }
 
-    // 4. AI agent (lazy-connects when the panel is opened and a key exists).
+    // 4. Cixy uses the server-side assistant endpoint.
     this.ai = new SpatialAIAgent({
       bus: this.bus,
       state: this.state,
       map: this.map,
-      getApiKey: () => this.settings.getKey("openaiKey"),
-      model: this.settings.getAll().aiModel,
     });
 
     this.#startStaleSweep();
@@ -345,15 +336,20 @@ export class B2BSaasEngine {
       }
     }, 1000);
 
-    if (!this.settings.hasKey("googleMapsKey")) {
-      this.ui.toast("Globe is live on the default tiles. Optional: add a Google Maps key for photorealistic 3D.");
-    }
 
     window.addEventListener("beforeunload", () => this.shutdown());
     return this;
   }
 
   #wireStream() {
+    this.bus.on("stream:snapshot", ({ assets }) => {
+      const present = new Set(assets.map((asset) => asset.id));
+      for (const id of this.state.assets.keys()) {
+        if (present.has(id)) continue;
+        this.map?.removeAssetMarker(id);
+        this.state.removeAsset(id);
+      }
+    });
     this.bus.on("stream:frame", (frame) => {
       const asset = this.state.upsertAsset(frame);
       if (this.state.layers.fleet) {
@@ -407,8 +403,8 @@ export class B2BSaasEngine {
   /** Called by the UI after keys are saved so live modules pick them up. */
   async applySettings() {
     const { googleMapsKey } = this.settings.getAll();
-    await this.map.setGoogleTiles(googleMapsKey);
-    this.ai?.reconfigure({ apiKey: this.settings.getKey("openaiKey") });
+    await this.map?.setGoogleTiles(googleMapsKey);
+    this.ai?.reconfigure();
   }
 
   shutdown() {

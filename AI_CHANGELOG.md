@@ -86,3 +86,12 @@ Entry format:
 ## 2026-10-04 (night) — Geoxis Lead (Grok), footer full family
 - Changed: `spatial-dashboard/src/ixisCompanies.js` — footer list now the full family (14 sites, Rawixis/companies order, minus Geoxis; adds Pinixis, Launchixis, Ominix). No restyle.
 - Why: Developer Bot hub order 19:19 CT. Undo: `git revert` the squash commit.
+
+## 2026-10-05 — Codex: Geoxis readiness fixes
+
+- Restored satellite basemap using Cesium's `baseLayer` API with bundled overview imagery as fallback, retained attribution, and kept controls usable on narrow screens.
+- Added missing pricing, password, and auth callback build entries; compiled dashboard styles locally; added required build/API checks to CI.
+- Routed authenticated fleet polling to tenant data, made feed status recover after errors, labelled simulated/stale data, and removed expired aircraft observations.
+- Preserved verified Auth metadata for onboarding, handled metadata-save failure, repaired callback/password session wiring, and hardened redirect/text rendering paths.
+- Removed unused OpenAI-key settings; marked unavailable plans and exports as coming soon while keeping redemption closed.
+- Updated active documentation and added regression tests. No production database, service-key, pricing, or Wallet-ledger changes.
