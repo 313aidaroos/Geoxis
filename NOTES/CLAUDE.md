@@ -44,3 +44,9 @@ See the 2026-10-06 table in `docs/LAUNCH_NOTES.md` and `docs/INGEST.md`. `npm te
 - Delete the root Meridian files + `spatial-dashboard/src/aiController.js` (`git rm`; this session was not allowed to delete files).
 - Point `geoxis.vercel.app` at the `spatial-dashboard` project; flip `PLANS_ON_SALE` when ready.
 - If the Supabase redirect allowlist is exact-match, keep `/auth/callback.html` (unchanged) in it.
+
+## 2026-10-06 (later, UTC) — Claude: PR #28 merged + deployed, database migrations applied
+- PR #28 squash-merged to `main` as `a01d681`; Vercel production deployment READY on that commit.
+- Supabase: 003 and 004 applied and verified (see AI_CHANGELOG). The advisor WARN that `authenticated` can execute the two SECURITY DEFINER functions is intentional: RLS policies call them as the signed-in role, and they only return booleans about the caller.
+- Still Awad's: delete the root Meridian files; point `geoxis.vercel.app` at the `spatial-dashboard` project; decide on the redesign proposal (board image sent 2026-10-06).
+
