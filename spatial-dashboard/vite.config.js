@@ -59,6 +59,7 @@ export default defineConfig({
         // 2026-10-06 (Claude): these three were never built, so /pricing, /set-password and the
         // magic-link callback returned 404 in production (flagged by Grok on 2026-09-27).
         pricing: resolve(__dirname, "pricing.html"),
+        track: resolve(__dirname, "track.html"),
         setPassword: resolve(__dirname, "set-password.html"),
         authCallback: resolve(__dirname, "auth/callback.html"),
       },

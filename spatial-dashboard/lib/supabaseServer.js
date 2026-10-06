@@ -145,7 +145,8 @@ export async function ensureUserTenant(user) {
 
   const role = admin ? "owner" : "member";
   await upsert("tenant_memberships", { tenant_id: tenant.id, user_id: user.id, email, role }, "tenant_id,user_id");
-  return { user: { id: user.id, email }, tenant, role, admin };
+  // Keep app_metadata so billing can use the Apixis ID sub (family rule: sub first, else verified email).
+  return { user: { id: user.id, email, app_metadata: user.app_metadata || {} }, tenant, role, admin };
 }
 
 export async function authContext(req) {

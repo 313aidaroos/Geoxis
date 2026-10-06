@@ -83,8 +83,10 @@ export function validatePositionsBody(body) {
   return { ok: true, positions, rejected };
 }
 
-/** Tracking seats last 30 days (D2); one-off products (export report) never expire. */
+/** Paid tracking lasts 30 days. The free trial lasts 14 days. One-off products never expire. */
 export function entitlementExpiry(productKey, now = Date.now()) {
-  if (String(productKey || "").startsWith("geoxis.tracking.")) return new Date(now + 30 * 24 * 60 * 60 * 1000).toISOString();
+  const key = String(productKey || "");
+  if (key === "geoxis.tracking.trial") return new Date(now + 14 * 24 * 60 * 60 * 1000).toISOString();
+  if (key.startsWith("geoxis.tracking.")) return new Date(now + 30 * 24 * 60 * 60 * 1000).toISOString();
   return null;
 }

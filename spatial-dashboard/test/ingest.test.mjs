@@ -64,8 +64,10 @@ test("positions body: single, array, wrapped; partial rejects; limits", () => {
   assert.equal(r.error, "too_many_positions");
 });
 
-test("entitlement expiry: tracking seats 30 days (D2), one-off report never", () => {
+test("entitlement expiry: tracking seats 30 days (D2), trial 14 days, one-off report never", () => {
   const now = Date.parse("2026-10-06T00:00:00Z");
   assert.equal(entitlementExpiry("geoxis.tracking.small", now), "2026-11-05T00:00:00.000Z");
+  assert.equal(entitlementExpiry("geoxis.tracking.object", now), "2026-11-05T00:00:00.000Z");
+  assert.equal(entitlementExpiry("geoxis.tracking.trial", now), "2026-10-20T00:00:00.000Z");
   assert.equal(entitlementExpiry("geoxis.export.report", now), null);
 });

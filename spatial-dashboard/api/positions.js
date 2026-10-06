@@ -10,6 +10,7 @@ import { hashIngestKey, looksLikeIngestKey, validatePositionsBody } from "../lib
 import { bearerToken } from "../lib/core.js";
 import { insertMany, patchWhere, selectMany, sendJson, upsertMany } from "../lib/supabaseServer.js";
 import { clientIp, rateLimited } from "../lib/rateLimit.js";
+import { activeObjectLimit, splitByObjectLimit } from "../lib/pricing.js";
 
 async function readBody(req) {
   if (req.body && typeof req.body === "object") return req.body;
@@ -68,7 +69,47 @@ export default async function handler(req, res) {
     // Last write per asset wins inside one batch.
     const byId = new Map();
     for (const p of v.positions) byId.set(p.external_id, p);
-    const positions = [...byId.values()];
+    let positions = [...byId.values()];
+
+    // Object cap: trial is 1, a paid plan is one seat per captured object (500 Ixis each).
+    let objectLimit = 0;
+    let existingIds = [];
+    try {
+      const tenantFilter = `tenant_id=eq.${encodeURIComponent(auth.tenant_id)}`;
+      let ents;
+      try {
+        ents = await selectMany("entitlements", `${tenantFilter}&select=product_key,object_limit,expires_at,status&limit=500`);
+      } catch (err) {
+        if (!/object_limit/i.test(String(err?.message || err))) throw err;
+        ents = await selectMany("entitlements", `${tenantFilter}&select=product_key,expires_at,status&limit=500`);
+      }
+      objectLimit = activeObjectLimit(ents);
+      const assets = await selectMany(
+        "tracked_assets",
+        `tenant_id=eq.${encodeURIComponent(auth.tenant_id)}&select=external_id&limit=10000`,
+      );
+      existingIds = assets.map((row) => row.external_id);
+    } catch (err) {
+      return sendJson(res, 503, { error: "object_limit_unavailable", message: "Could not check how many things this account can follow." }, cors);
+    }
+    const gate = splitByObjectLimit({
+      limit: objectLimit,
+      existingIds,
+      incomingIds: positions.map((p) => p.external_id),
+    });
+    const allowed = new Set(gate.allowedIds);
+    const limitedOut = positions.filter((p) => !allowed.has(p.external_id)).map((p) => ({ id: p.external_id, error: "object_limit" }));
+    positions = positions.filter((p) => allowed.has(p.external_id));
+    if (!positions.length) {
+      return sendJson(res, 402, {
+        error: "object_limit",
+        limit: objectLimit,
+        rejected: [...(v.rejected || []), ...limitedOut],
+        message: objectLimit
+          ? `This account can follow ${objectLimit} things. Raise the plan to follow more.`
+          : "This account has no tracking plan. Start the 14-day trial or buy a plan. Each thing is $5 a month.",
+      }, cors);
+    }
 
     const assets = await upsertMany(
       "tracked_assets",
@@ -102,7 +143,12 @@ export default async function handler(req, res) {
     await insertMany("asset_positions", rows);
     patchWhere("ingest_keys", `id=eq.${encodeURIComponent(auth.id)}`, { last_used_at: now }).catch(() => {});
 
-    return sendJson(res, 202, { accepted: rows.length, rejected: v.rejected, tenant_id: auth.tenant_id }, cors);
+    return sendJson(res, 202, {
+      accepted: rows.length,
+      rejected: [...(v.rejected || []), ...limitedOut],
+      objectLimit,
+      tenant_id: auth.tenant_id,
+    }, cors);
   } catch (err) {
     if (err instanceof SyntaxError) return sendJson(res, 400, { error: "invalid_json" }, cors);
     return sendJson(res, err.status || 500, { error: "ingest_failed", message: String(err?.message || err) }, cors);

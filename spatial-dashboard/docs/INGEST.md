@@ -67,6 +67,10 @@ Limits: 500 positions per request, 1 MB body, about 600 requests per 10 minutes 
 - `GET /api/assets` with your session token returns `demo: false` and your rows once at least one position landed.
 - Cixy uses the same list, so "where is Truck 12?" answers from your data.
 
+## How many things you can follow
+
+Each paid thing is one active `geoxis.tracking.object` row (500 Ixis, 30 days). The free trial is one `geoxis.tracking.trial` row for 14 days. Older Small / Medium / Large rows still count as 10 / 50 / 200 if they are active. `POST /api/positions` rejects a new id once that count is full (`402 object_limit`). Updates to ids already stored are still accepted while the plan is active. With no plan, every position is rejected.
+
 ## Not done yet (design is Awad's call)
 
 - A key-management panel in the UI. Today keys are created with the console snippet above.
