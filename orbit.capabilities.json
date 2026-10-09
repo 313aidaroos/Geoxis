@@ -7,11 +7,11 @@
     {
       "id": "geoxis.asset.read",
       "mode": "read",
-      "status": "planned",
-      "proposedEndpoint": "GET /api/orbit/v1/assets/:assetId (proposed; do not expose until verified)",
+      "status": "implemented_gated",
+      "proposedEndpoint": "POST /api/orbit/assets",
       "requiresOwnerTenantBinding": true,
       "requiresTests": true
     }
   ],
-  "notes": "Planning metadata only. This file grants no API access and must not be treated as proof of runtime integration."
+  "notes": "Adapter code committed but NOT enabled, deployed/authorized/tested with production data. runtimeConnected stays false."
 }
