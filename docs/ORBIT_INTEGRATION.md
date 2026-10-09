@@ -1,3 +1,15 @@
+# RUNTIME UPDATE — 2026-10-09
+
+This integration now has code on **this draft branch**, but remains **disabled** until the owner follows the [central Orbit setup runbook](https://github.com/313aidaroos/Apixis.dev/blob/feat/orbit-lite-safe-core-20261009/docs/ORBIT_OWNER_ACTIONS.md). The status is **implemented_gated / runtimeConnected=false**. Do not claim live cross-site execution. Route: POST /api/orbit/assets. Server-only key: ORBIT_GEOXIS_SHARED_SECRET.
+
+Files: `spatial-dashboard/lib/orbit.js`, `spatial-dashboard/api/orbit/assets.js`, `spatial-dashboard/test/orbit.test.mjs`.
+
+Geoxis verifies signed Apixis ID subject against its existing Supabase Auth user, then checks tenant membership and reads only its real current positions; it never uses the demo fallback.
+
+Review CI, explicit test accounts, actual Vercel project and secrets in Preview before enabling the corresponding Core flag. The existing rules in this project's AGENTS.md and README remain authoritative. Read-only-only: no payment, bid, external email, settlement or asset control.
+
+---
+
 # Orbit integration handoff — Geoxis (2026-10-09)
 
 **Status: NOT CONNECTED.** This branch adds a repo-specific build contract and a machine-readable capability declaration. It does not expose an API or integrate product data yet.
