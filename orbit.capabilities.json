@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "product": "Geoxis",
+  "orbitCore": "313aidaroos/Apixis.dev",
+  "runtimeConnected": false,
+  "capabilities": [
+    {
+      "id": "geoxis.asset.read",
+      "mode": "read",
+      "status": "planned",
+      "proposedEndpoint": "GET /api/orbit/v1/assets/:assetId (proposed; do not expose until verified)",
+      "requiresOwnerTenantBinding": true,
+      "requiresTests": true
+    }
+  ],
+  "notes": "Planning metadata only. This file grants no API access and must not be treated as proof of runtime integration."
+}
